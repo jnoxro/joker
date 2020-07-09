@@ -9,20 +9,34 @@
 #include <iostream>
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
-#include <opencv2/imgcodecs/imgcodecs.hpp>
 
-#include <opencv2/core.hpp>
+#include "imggrab.h"
 
 using namespace std;
 using namespace cv;
 
 int main() {
-	Mat img = imread("test/test.jpg");
-	cout << "sah dude" << endl; // prints sah dude
 
-	namedWindow( "Display window", WINDOW_AUTOSIZE );// Create a window for display.
-	imshow( "Display window", img );                   // Show our image inside it.
+	imggrab grabber;
+	Mat img;
 
-	waitKey(0);                                          // Wait for a keystroke in the window
+	if (grabber.grab())
+	{
+		img = grabber.give();
+		/*
+		imshow( "Display window", img );                   //show grabbed img
+		waitKey(0);
+		*/
+
+
+
+	}
+	else
+	{
+		cout << "no image!" << endl; // prints sah dude
+		return 0;
+	}
+
+
 	return 0;
 }
