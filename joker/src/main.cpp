@@ -1,5 +1,5 @@
 //============================================================================
-// Name        : main.cpp
+// Name        : joker main.cpp
 // Author      : Jack Orton
 // Version     :
 // Copyright   : its free baby
@@ -7,7 +7,7 @@
 //============================================================================
 
 //TODO
-// - create joker class
+// - create joker class (the ocr bit lol)
 // - load model at start
 
 #include <iostream>
