@@ -1,5 +1,5 @@
 //============================================================================
-// Name        : joker.cpp
+// Name        : main.cpp
 // Author      : Jack Orton
 // Version     :
 // Copyright   : its free baby
