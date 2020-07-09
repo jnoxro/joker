@@ -14,14 +14,16 @@
 using namespace std;
 using namespace cv;
 
-imggrab::imggrab()
+imggrab::imggrab() //initialise
 {
-    ret = 0;
+	ret = 0;
 }
 
-int imggrab::grab()
+int imggrab::grab(string filename) //set to "" for release
 {
-    image = imread("test/test.jpg");  //read image
+
+    file = filename;
+    image = imread(file);  //read image
 
     if (!image.data)
     {
