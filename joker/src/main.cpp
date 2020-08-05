@@ -9,6 +9,7 @@
 //TODO
 // - create joker class (the ocr bit lol)
 // - load model at start
+// - if no args - open in wait mode and wait for file paths
 
 #include <iostream>
 #include <opencv2/core/core.hpp>
@@ -33,9 +34,10 @@ int main(int argc, const char* argv[]) {
 	if (grabber.grab(string(argv[1]))) //if able to load image
 	{
 		img = grabber.give();
+		cout << "hehe" << endl;
 
-		//imshow( "Display window", img );                   //show grabbed img
-		//waitKey(0);
+		imshow( "Display window", img );                   //show grabbed img
+		waitKey(0);
 
 
 
