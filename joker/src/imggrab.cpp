@@ -6,13 +6,12 @@
  */
 
 #include <iostream>
-#include <opencv2/core/core.hpp>
-#include <opencv2/imgcodecs/imgcodecs.hpp>
+#include <Magick++.h>
 
 #include "imggrab.h"
 
 using namespace std;
-using namespace cv;
+using namespace Magick;
 
 imggrab::imggrab() //initialise
 {
@@ -23,7 +22,7 @@ int imggrab::grab(string filename) //set to "" for release
 {
 
     file = filename;
-    image = imread(file);  //read image
+    image.read(file);  //read image
 
     if (!image.data)
     {
@@ -38,7 +37,7 @@ int imggrab::grab(string filename) //set to "" for release
 }
 
 
-Mat imggrab::give()
+Image imggrab::give()
 {
     return image;
 }

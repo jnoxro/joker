@@ -12,18 +12,18 @@
 // - if no args - open in wait mode and wait for file paths
 
 #include <iostream>
-#include <opencv2/core/core.hpp>
-#include <opencv2/highgui/highgui.hpp>
+#include <Magick++.h>
 
 #include "imggrab.h"
 
 using namespace std;
-using namespace cv;
+using namespace Magick;
 
 int main(int argc, const char* argv[]) {
+	InitializeMagick(NULL);
 
 	imggrab grabber;
-	Mat img;
+	Image img;
 
 	if (argc < 2){ 	//calling program is first arg
 		cout << "need more args:" << endl;
@@ -35,10 +35,6 @@ int main(int argc, const char* argv[]) {
 	{
 		img = grabber.give();
 		cout << "hehe" << endl;
-
-		imshow( "Display window", img );                   //show grabbed img
-		waitKey(0);
-
 
 
 	}

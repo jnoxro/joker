@@ -8,7 +8,7 @@
 #ifndef IMGGRAB_H_
 #define IMGGRAB_H_
 
-#include <opencv2/core/core.hpp>
+#include <Magick++.h>
 #include <string>
 
 class imggrab
@@ -17,13 +17,13 @@ class imggrab
     private:
         int ret;    //load success/fail
         std::string file;	//filename
-        cv::Mat image;  //read image
+        Magick::Image image;  //read image
 
     public:
         imggrab();  //constructor
 
         int grab(std::string filename); //image grabber
-        cv::Mat give(); //return
+        Magick::Image give(); //return
 
 };
 
