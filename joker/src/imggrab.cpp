@@ -1,9 +1,10 @@
-/*
- * imggrab.cpp
- *
- *  Created on: 9 Jul 2020
- *      Author: jack
- */
+//============================================================================
+// Name        : imggrab.cpp
+// Author      : Jack Orton
+// Version     :
+// Copyright   : MIT License
+// Description : Class for loading, storing and providing images to code
+//============================================================================
 
 #include <iostream>
 #include <Magick++.h>
@@ -22,16 +23,22 @@ int imggrab::grab(string filename) //set to "" for release
 {
 
     file = filename;
-    image.read(file);  //read image
+    try
+    {
+    	image.read(file);  //read image
+    	ret = 1;
+    }
+    catch(WarningFileOpen &warning)
+	{
+    	cerr << "Warning: " << warning.what() << endl;
+    	ret = 0;
+	}
+    catch( Magick::ErrorFileOpen &error )
+    {
+    	cerr << "Error: " << error.what() << endl;
+    	ret = 0;
+    }
 
-    if (!image.data)
-    {
-        ret = 0;
-    }
-    else
-    {
-        ret = 1;
-    }
 
     return ret;
 }

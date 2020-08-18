@@ -1,9 +1,10 @@
-/*
- * imggrab.h
- *
- *  Created on: 9 Jul 2020
- *      Author: jack
- */
+//============================================================================
+// Name        : imggrab.h
+// Author      : Jack Orton
+// Version     :
+// Copyright   : MIT License
+// Description : Header file for imaggrab.cpp
+//============================================================================
 
 #ifndef IMGGRAB_H_
 #define IMGGRAB_H_
