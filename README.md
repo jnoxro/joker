@@ -1,2 +1,2 @@
 # joker
-fast OCR with openCV and C++
+fast OCR
