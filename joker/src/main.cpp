@@ -6,10 +6,20 @@
 // Description : super amazing fast OCR
 //============================================================================
 
-//TODO
+//TODO  main
 // - create joker class (the ocr bit lol)
 // - load model at start
 // - if no args - open in wait mode and wait for file paths
+
+//TODO Train
+// - folders for each letter numbered from 0, contained images numbered from 0
+// - start from folder 0, img 0, iterate img till !exists, iterate folder etc...
+// - user provided map
+// - create model from images
+// - save model in loadable format
+
+//TODO Maybe
+// - data set helper / creater
 
 #include <iostream>
 #include <Magick++.h>
