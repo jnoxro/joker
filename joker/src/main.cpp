@@ -23,6 +23,7 @@
 // - data set helper / creater
 
 #include <cstring>
+#include <string>
 #include <iostream>
 #include <Magick++.h>
 
@@ -40,17 +41,15 @@ int main(int argc, const char* argv[]) {
 
 
 	//defaults
-	char filepath[] = "test.jpg";
-	char modelpath[] = "model.jkr";
-	char datapath[] = "data";
-	char newmodel[] = "mymodel";
+	string filepath = "test.jpg";
+	string modelpath = "model.jkr";
+	string datapath = "data";
+	string newmodel = "mymodel";
 	int repeat = 0;
 	int mode = 0;
 
 
 	if (argc < 2){ 	//calling program is first arg
-
-		cout << strcmp(filepath, "tesjt.jpg") << endl;
 
 		cout << "[Joker] Welcome to Joker" << endl;
 
@@ -70,53 +69,50 @@ int main(int argc, const char* argv[]) {
 	{
 		for (int count = 1; count < argc; count++)
 		{
-			if (strcmp(argv[count],"-o") == 0)
+			string argu = argv[count];
+			if (argu == "-o")
 			{
 				if (mode == 2)
 				{
-					cout << "[Joker] can't use -o and -t at same time" << endl;
-					break;
-					return 0;
+					cerr << "[Joker] can't use -o and -t at same time" << endl;
 				}
 				mode = 1;
 				for (int count1 = 1; count1 < argc; count1++)
 				{
-					if (strcmp(argv[count1],"-i") == 0)
+					string argu1 = argv[count1];
+					if (argu1 == "-i")
 					{
-						strcpy(filepath,argv[count1+1]);
+						filepath = argv[count1+1];
 					}
-					if (strcmp(argv[count1],"-m") == 0)
+					if (argu1 == "-m")
 					{
-						strcpy(modelpath,argv[count1+1]);
+						modelpath = argv[count1+1];
 					}
-					if (strcmp(argv[count1],"-r") == 0)
+					if (argu1 == "-r")
 					{
 						repeat = 1;
 					}
 				}
-				break;
 			}
-			if (strcmp(argv[count],"-t") == 0)
+			if (argu == "-t")
 			{
 				if (mode == 1)
 				{
-					cout << "[Joker] can't use -o and -t at same time" << endl;
-					break;
-					return 0;
+					cerr << "[Joker] can't use -o and -t at same time" << endl;
 				}
 				mode = 2;
 				for (int count2 = 0; count2 < argc; count2++)
 				{
-					if (strcmp(argv[count2],"-d") == 0)
+					string argu2 = argv[count2];
+					if (argu2 == "-d")
 					{
-						strcpy(datapath,argv[count2+1]);
+						datapath = argv[count2+1];
 					}
-					if (strcmp(argv[count2],"-n") == 0)
+					if (argu2 == "-n")
 					{
-						strcpy(newmodel,argv[count2+1]);
+						newmodel = argv[count2+1];
 					}
 				}
-				break;
 			}
 		}
 	}
