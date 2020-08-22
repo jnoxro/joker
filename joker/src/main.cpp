@@ -6,12 +6,11 @@
 // Description : super amazing fast OCR
 //============================================================================
 
-//TODO  main
+//TODO/notes  main
 // - create joker class (the ocr bit lol)
 // - load model at start
-// - if no args - open in wait mode and wait for file paths
 
-//TODO Train
+//TODO/notes Train
 // - folders for each letter numbered from 0, contained images numbered from 0
 // - start from folder 0, img 0, iterate img till !exists, iterate folder etc...
 // - user provided map
@@ -19,7 +18,7 @@
 // - save model in loadable format
 // - Decision trees with PCA? -> less operations to carry out maybe faster
 
-//TODO Maybe
+//TODO/notes Maybe
 // - data set helper / creater
 
 #include <string>
@@ -146,7 +145,7 @@ void welcome()
 	cout << "[Joker] -m model filepath | -m model.jkr" << endl;
 	cout << "[Joker] -r repeat mode    | -r" << endl;
 
-	cout << "\n[Joker] Training launch flags\n:" << endl;
+	cout << "\n[Joker] Training launch flags:\n" << endl;
 	cout << "[Joker] -t train mode     | -t" << endl;
 	cout << "[Joker] -d data folder    | -d data" << endl;
 	cout << "[Joker] -n new model name | -n mymodel" << endl;
