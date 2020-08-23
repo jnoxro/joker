@@ -48,8 +48,8 @@ int main(int argc, const char* argv[]) {
 	void welcome();
 
 	//argy parsy//
-	if (argc < 2){
-
+	if (argc < 2)
+	{
 		welcome();
 		return 0;
 	}
@@ -107,8 +107,23 @@ int main(int argc, const char* argv[]) {
 		}
 	}
 
+	if (mode == 2)
+	{
+		//train model
+	}
+
+	if (mode == 1)
+	{
+		//ocr time
+		if (repeat == 1)
+		{
+			//ocr in loop and wait for file name
+		}
+	}
 
 
+
+	/*
 	if (grabber.grab(string(argv[1]))) //if able to load image
 	{
 		img = grabber.give();
@@ -120,7 +135,7 @@ int main(int argc, const char* argv[]) {
 		cout << "[Joker] no image!.. Exiting" << endl; // prints sah dude
 		return 0;
 	}
-
+	*/
 
 	return 0;
 }
