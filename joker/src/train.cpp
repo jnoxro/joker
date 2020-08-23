@@ -68,8 +68,11 @@ void train::trainpixelavg()
 				break;
 			}
 
-			//if total colours > 2
+
 			//	//adaptive threshold
+			// monocolor? black yes/no -> 2d array
+			// .jkr file -> some arrangement of all images
+			// first lines of file specify matrix size, methodology type etc
 
 		}
 	}
