@@ -24,7 +24,15 @@ train::train(std::string path, std::string name) //initialise
 
 void train::trainpixeladd()
 {
-
+	try
+	{
+		//open map.txt
+		cout << "opening" << endl;
+	}
+	catch (...) //ellipsis is a catch all - no data given
+	{
+		cerr << "[Joker] Error: unable to open map" << endl;
+	}
 }
 
 
