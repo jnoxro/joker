@@ -67,6 +67,10 @@ void train::trainpixelavg()
 				cout << "[Joker] Loaded " << counter << " samples for " << map[i] << endl;
 				break;
 			}
+
+			//if total colours > 2
+			//	//adaptive threshold
+
 		}
 	}
 
