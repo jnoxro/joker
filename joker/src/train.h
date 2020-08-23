@@ -13,6 +13,8 @@
 #include <Magick++.h>
 #include <vector>
 
+#include "imggrab.h"
+
 class train
 {
 
@@ -20,6 +22,7 @@ class train
 		std::string newmodel;
 		std::string datapath;
 
+		imggrab fetcher;
 		Magick::Image image;
 
 		std::vector<std::string> map;
