@@ -111,21 +111,27 @@ int main(int argc, const char* argv[]) {
 	if (mode == 2)
 	{
 		//train model
+		cout << "[Joker] train" << endl;
 	}
 
 	if (mode == 1)
 	{
 		//ocr time
-		if (repeat == 1)
+		if (repeat == 0)
+		{
+			cout << "[Joker] ocr" << endl;
+		}
+		else
 		{
 			//ocr in loop and wait for file name
+			cout << "[Joker] repeat ocr" << endl;
 		}
 	}
 
 
 
-	/*
-	if (grabber.grab(string(argv[1]))) //if able to load image
+
+	if (grabber.grab("a.jpg")) //if able to load image
 	{
 		img = grabber.give();
 		cout << "[Joker] hehe" << endl;
@@ -136,7 +142,7 @@ int main(int argc, const char* argv[]) {
 		cout << "[Joker] no image!.. Exiting" << endl; // prints sah dude
 		return 0;
 	}
-	*/
+
 
 	return 0;
 }

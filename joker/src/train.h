@@ -26,7 +26,6 @@ class train
 		train(std::string path, std::string name); //constructor
 
 
-		void methodchoose();
 
 		//methodologies:
 		void trainpixeladd(); //og pixel addition
