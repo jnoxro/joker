@@ -30,12 +30,12 @@ int imggrab::grab(string filename) //set to "" for release
     }
     catch(WarningFileOpen &warning)
 	{
-    	cerr << "[Joker] Warning: " << warning.what() << endl;
+    	//cerr << "[Joker] Warning: " << warning.what() << endl;
     	ret = 0;
 	}
     catch( Magick::ErrorFileOpen &error )
     {
-    	cerr << "[Joker] Error: " << error.what() << endl;
+    	//cerr << "[Joker] Error: " << error.what() << endl;
     	ret = 0;
     }
 

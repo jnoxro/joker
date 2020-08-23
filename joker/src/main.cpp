@@ -25,7 +25,6 @@
 #include <iostream>
 #include <Magick++.h>
 
-#include "imggrab.h"
 #include "train.h"
 
 using namespace std;
@@ -33,10 +32,6 @@ using namespace Magick;
 
 int main(int argc, const char* argv[]) {
 	InitializeMagick(NULL);
-
-	imggrab grabber;
-	Image img;
-
 
 	//defaults//
 	string filepath = "test.jpg";
@@ -130,18 +125,6 @@ int main(int argc, const char* argv[]) {
 
 
 
-
-	if (grabber.grab("a.jpg")) //if able to load image
-	{
-		img = grabber.give();
-		cout << "[Joker] hehe" << endl;
-
-	}
-	else
-	{
-		cout << "[Joker] no image!.. Exiting" << endl; // prints sah dude
-		return 0;
-	}
 
 
 	return 0;
