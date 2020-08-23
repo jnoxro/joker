@@ -7,8 +7,10 @@
 //============================================================================
 
 #include <iostream>
+#include <stdlib.h>
 #include <fstream>
 #include <Magick++.h>
+#include <vector>
 
 #include "train.h"
 #include "imggrab.h"
@@ -20,19 +22,39 @@ train::train(std::string path, std::string name) //initialise
 {
 	datapath = path;
 	newmodel = name;
+
+	cout << "[Joker] Training mode" << endl;
+	cout << "\n[Joker] Data path: " << datapath << endl;
+	cout << "[Joker] New model name: " << newmodel << endl;
 }
 
-void train::trainpixeladd()
+void train::trainpixelavg()
 {
-	try
+	cout << "\n[Joker] Pixel Average training" << endl;
+
+	ifstream input(datapath + "/map.txt");
+	if (!input.is_open())
 	{
-		//open map.txt
-		cout << "opening" << endl;
+		cerr << "[Joker] Error: Unable to open map" << endl;
+		exit(EXIT_FAILURE);
 	}
-	catch (...) //ellipsis is a catch all - no data given
+
+	for(string line; getline( input, line ); )
 	{
-		cerr << "[Joker] Error: unable to open map" << endl;
+	    map.push_back(line);
 	}
+	input.close();
+
+	cout << "[Joker] Library size:   " << map.size()-1 << endl;
+	cout << "[Joker] File Extension: " << map[0] << endl;
+
+	/*
+	for (int i = 0; i < map.size(); i++)
+	{
+		cout << map[i] << endl;
+	}
+	*/
+
 }
 
 

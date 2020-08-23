@@ -11,6 +11,7 @@
 
 #include <string>
 #include <Magick++.h>
+#include <vector>
 
 class train
 {
@@ -21,16 +22,14 @@ class train
 
 		Magick::Image image;
 
+		std::vector<std::string> map;
+
 
     public:
 		train(std::string path, std::string name); //constructor
 
-
-
 		//methodologies:
-		void trainpixeladd(); //og pixel addition
-
-
+		void trainpixelavg(); //og pixel addition
 };
 
 

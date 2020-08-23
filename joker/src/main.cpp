@@ -110,8 +110,8 @@ int main(int argc, const char* argv[]) {
 
 	if (mode == 2)
 	{
-		//train model
-		cout << "[Joker] train" << endl;
+		train trainer(datapath, newmodel);
+		trainer.trainpixelavg();
 	}
 
 	if (mode == 1)
