@@ -9,8 +9,30 @@
 #ifndef TRAIN_H_
 #define TRAIN_H_
 
+#include <string>
+#include <Magick++.h>
+
+class train
+{
+
+    private:
+		std::string newmodel;
+		std::string datapath;
+
+		Magick::Image image;
 
 
+    public:
+		train(std::string path, std::string name); //constructor
+
+
+		void methodchoose();
+
+		//methodologies:
+		void trainpixeladd(); //og pixel addition
+
+
+};
 
 
 #endif /* TRAIN_H_ */

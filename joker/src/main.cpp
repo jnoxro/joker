@@ -26,6 +26,7 @@
 #include <Magick++.h>
 
 #include "imggrab.h"
+#include "train.h"
 
 using namespace std;
 using namespace Magick;
