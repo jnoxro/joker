@@ -59,6 +59,16 @@ void train::trainpixelavg()
 			if (fetcher.grab(datapath + "/" + map[i] + "/" + to_string(counter) + map[0]) == 1)
 			{
 				image = fetcher.give();
+
+				//	//adaptive threshold
+				// monocolor? black yes/no -> 2d array
+				// .jkr file -> some arrangement of all images
+				// first lines of file specify matrix size, methodology type etc
+				// crop to smallest image - trim model or latest image unless big difference then skip
+				image.threshold(125);
+				image.type(BilevelType);
+
+
 				counter++;
 			}
 			else
@@ -69,10 +79,7 @@ void train::trainpixelavg()
 			}
 
 
-			//	//adaptive threshold
-			// monocolor? black yes/no -> 2d array
-			// .jkr file -> some arrangement of all images
-			// first lines of file specify matrix size, methodology type etc
+
 
 		}
 	}
