@@ -25,6 +25,9 @@ train::train(std::string path, std::string name) //initialise
 	datapath = path;
 	newmodel = name;
 
+	w = 0;
+	h = 0;
+
 	cout << "[Joker] Training mode" << endl;
 	cout << "\n[Joker] Data path: " << datapath << endl;
 	cout << "[Joker] New model name: " << newmodel << endl;
@@ -60,20 +63,34 @@ void train::trainpixelavg()
 			{
 				image = fetcher.give();
 
-				//	//adaptive threshold
-				// monocolor? black yes/no -> 2d array
-				// .jkr file -> some arrangement of all images
+				if (h == 0)
+				{
+					h = image.rows();
+					w = image.columns();
+					cout << "[Joker] Detected dimension: " << h << "*" << w << endl;
+				}
+				else if (image.rows() != h || image.columns() != w)
+				{
+					cerr << "[Joker] Error: dimension mismatch: " << map[i] << "/" << counter  << map[0] << " not: " << h << "*" << w << endl;
+					exit(EXIT_FAILURE);
+				}
+
+
+				// .jkr file -> some arrangement of all matrices
 				// first lines of file specify matrix size, methodology type etc
 				// crop to smallest image - trim model or latest image unless big difference then skip
+
+
 				image.threshold(125);
-				image.type(BilevelType);
+
+				ColorRGB pixcol = image.pixelColor(12,1);
+				cout << pixcol.red() << " " << pixcol.blue() << " " << pixcol.green() << endl;
 
 
 				counter++;
 			}
 			else
 			{
-				counter--;
 				cout << "[Joker] Loaded " << counter << " samples for " << map[i] << endl;
 				break;
 			}

@@ -22,8 +22,13 @@ class train
 		std::string newmodel;
 		std::string datapath;
 
+		unsigned int h;
+		unsigned int w;
+
 		imggrab fetcher;
+
 		Magick::Image image;
+		//Magick::ColorMono pixval;
 
 		std::vector<std::string> map;
 
