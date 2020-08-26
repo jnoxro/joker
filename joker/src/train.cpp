@@ -87,9 +87,9 @@ void train::trainpixelavg()
 
 				//nasty code for now
 				//pixelColor is slow should use magick++ image cache
-				for (int j = 0; j < h-1; j++)
+				for (unsigned int j = 0; j < h; j++)
 				{
-					for (int k = 0; k < w-1; k++)
+					for (unsigned int k = 0; k < w; k++)
 					{
 						pixcol = image.pixelColor(j,k);
 
@@ -101,7 +101,7 @@ void train::trainpixelavg()
 							}
 							else
 							{
-								model.at((j*(w-1))+k)++;
+								model.at((j*(w))+k)++;
 							}
 						}
 						else
@@ -111,8 +111,6 @@ void train::trainpixelavg()
 								model.push_back(0);
 							}
 						}
-
-
 					}
 				}
 
@@ -130,11 +128,13 @@ void train::trainpixelavg()
 				break;
 			}
 
-
-
-
-
 		}
+
+	}
+	cout << "model size: " << model.size() << endl;
+	for (int l = 0; l < 1600; l++)
+	{
+		cout << model.at(l) << endl;
 	}
 
 
