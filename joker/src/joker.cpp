@@ -18,15 +18,20 @@
 #include "imggrab.h"
 
 using namespace std;
+using namespace Magick;
 
-joker::joker(string modeln) //initialise
+joker::joker(string modeln, int mode, std::string imgpath) //initialise
 {
 	modelname = modeln;
+	filepath = imgpath;
 	loadmodel();
 }
 
 void joker::loadmodel()
 {
+
+	//cout << "loading model" << endl;
+
 	ifstream input(modelname);
 	if (!input.is_open())
 	{
@@ -45,22 +50,35 @@ void joker::loadmodel()
 		}
 		if (readmode == 1)
 		{
+			h = stoi(line);
+			readmode = 2;
+			continue;
+		}
+		if (readmode == 2)
+		{
+			w = stoi(line);
+			readmode = 3;
+			continue;
+		}
+		if (readmode == 3)
+		{
 			if (line == "map::")
 			{
-				readmode = 2;
+				readmode = 4;
 				continue;
 			}
 			else
 			{
-				cerr << "[Joker] Error: Model format error" << endl;
+				cerr << "[Joker] Error: Model format error map::" << endl;
+				cout << line << endl;
 				exit(EXIT_FAILURE);
 			}
 		}
-		if (readmode == 2)
+		if (readmode == 4)
 		{
 			if (line == "model::")
 			{
-				readmode = 3;
+				readmode = 5;
 				continue;
 			}
 			else
@@ -68,16 +86,67 @@ void joker::loadmodel()
 				map.push_back(line);
 			}
 		}
-		if (readmode == 3)
+		if (readmode == 5)
 		{
 			if (map.size() == 0)
 			{
-				cerr << "[Joker] Error: Model format error" << endl;
+				cerr << "[Joker] Error: Model format error model::" << endl;
+				cout << line << endl;
 				exit(EXIT_FAILURE);
 			}
 			model.push_back(stoi(line));
 		}
 	}
+
+	//cout << "loaded model" << endl;
+	//cout << "model size: " << model.size() << endl;
+
+	if (modeltype == "pixelaverage")
+	{
+		ocrpixelavg();
+	}
 }
+
+void joker::ocrpixelavg()
+{
+	imggrab fetcher;
+
+	if (fetcher.grab(filepath) == 1)
+	{
+		image = fetcher.give();
+
+		if (image.rows() != h || image.columns() != w)
+		{
+			cerr << "[Joker] Error: Image does not match model dimensions" << endl;
+			exit(EXIT_FAILURE);
+		}
+
+		ColorRGB pixcol;
+		int score = 0;
+		int tempscore = 0;
+		string letter;
+		for (unsigned int i = 0; i < map.size(); i++)
+		{
+			tempscore = 0;
+			for (unsigned int j = 0; j < h; j++)
+			{
+				for (unsigned int k = 0; k < w; k++)
+				{
+					pixcol = image.pixelColor(k,j);  //flipped j,k so model is height * width
+					tempscore = tempscore + (pixcol.red() * model.at((i*w*h)+(j*w)+k));
+				}
+			}
+			if (tempscore > score)
+			{
+				score = tempscore;
+				letter  = map[i];
+			}
+		}
+		cout << letter << endl;
+		cout << score << endl;
+
+	}
+}
+
 
 

@@ -23,10 +23,18 @@ class joker
 		std::string modelname;
 		std::string modeltype;
 
+		std::string filepath;
+		Magick::Image image;
+
+		unsigned int h;
+		unsigned int w;
+
+
 		void loadmodel();
+		void ocrpixelavg();
 
     public:
-        joker(std::string modeln);  //constructor
+        joker(std::string modeln, int mode, std::string imgpath);  //constructor
 
 
 

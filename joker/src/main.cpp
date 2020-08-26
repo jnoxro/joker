@@ -24,10 +24,13 @@
 #include <string>
 #include <iostream>
 #include <Magick++.h>
+#include <chrono>
 
 #include "train.h"
+#include "joker.h"
 
 using namespace std;
+using namespace std::chrono;
 using namespace Magick;
 
 int main(int argc, const char* argv[]) {
@@ -111,6 +114,8 @@ int main(int argc, const char* argv[]) {
 
 	if (mode == 1)
 	{
+		auto start = high_resolution_clock::now();
+		joker ocr(modelpath, repeat, filepath);
 		//ocr time
 		if (repeat == 0)
 		{
@@ -121,6 +126,10 @@ int main(int argc, const char* argv[]) {
 			//ocr in loop and wait for file name
 			cout << "[Joker] repeat ocr" << endl;
 		}
+		auto stop = high_resolution_clock::now();
+		auto duration = duration_cast<milliseconds>(stop - start);
+
+		cout << duration.count() << " millisecs" <<endl;
 	}
 
 
