@@ -6,6 +6,11 @@
 // Description : OCR class, uses trained model to predict letter
 //============================================================================
 
+
+//TODO
+// - work queue of each letter score, thread pool works through
+
+
 #include <iostream>
 #include <iomanip>
 #include <stdlib.h>
