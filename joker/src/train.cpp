@@ -102,6 +102,11 @@ void train::trainpixelavg()
 							else
 							{
 								model.at((lettercount*h*w)+(j*w)+k)++;
+
+								if (j < 5 || k < 5 || j > (h-5) || k > (w-5))
+								{
+									model.at((lettercount*h*w)+(j*w)+k) = model.at((lettercount*h*w)+(j*w)+k) * 0.2;
+								}
 							}
 						}
 						else
@@ -131,64 +136,34 @@ void train::trainpixelavg()
 
 	}
 
-	cout << "\n[Joker] Model created, saving as: " << newmodel << ".jkr" << endl;
+	cout << "\n[Joker] Model created" << endl;
 
-	ofstream output(newmodel + ".jkr");
-	output << "pixelaverage" << endl;
-	output << h << endl;
-	output << w << endl;
-	output << "map::" << endl; //map marker
-	for (long unsigned int g = 1; g < map.size(); g++)
-	{
-		output << map[g] << endl;
-	}
-	output << "model::" << endl; //model marker
-	for (long unsigned int h = 0; h < model.size(); h++)
-	{
-		output << model[h] << endl;
-	}
-	output.close();
+	savemodel("pixelaverage");
 
-	cout << "[Joker] Model saved" << endl;
-
-
-/*
-	int p = 0;
-	int o = 0;
-	for (int l = 0; l < 8000; l++)
-	{
-		cout << setw(3) << model.at(l);
-		if (p == 40)
-		{
-			cout << "\n";
-			p = 0;
-		}
-		if (o == 1600)
-		{
-			cout << "\n\n";
-			o = 0;
-		}
-		o++;
-		p++;
-	}
-*/
-
-
-	/*
-	for (int i = 0; i < map.size(); i++)
-	{
-		cout << map[i] << endl;
-	}
-	*/
-
-	/*
-	for (int v = 0; v < 40; v++)
-	{
-		cout << v << endl;
-	}
-	*/
 
 }
 
+void train::savemodel(string mode)
+{
+	if (mode == "pixelaverage")
+	{
+		ofstream output(newmodel + ".jkr");
+		output << "pixelaverage" << endl;
+		output << h << endl;
+		output << w << endl;
+		output << "map::" << endl; //map marker
+		for (long unsigned int g = 1; g < map.size(); g++)
+		{
+			output << map[g] << endl;
+		}
+		output << "model::" << endl; //model marker
+		for (long unsigned int h = 0; h < model.size(); h++)
+		{
+			output << model[h] - 1 << endl; //-1 for negative scoring in white space
+		}
+		output.close();
 
+		cout << "[Joker] Model saved" << endl;
+	}
+}
 
