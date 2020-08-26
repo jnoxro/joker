@@ -57,7 +57,7 @@ void train::trainpixelavg()
 	input.close();
 
 	cout << "[Joker] Library size:   " << map.size()-1 << endl;
-	cout << "[Joker] File Extension: " << map[0] << "\n" << endl;
+	cout << "[Joker] File Extension: " << map[0] << endl;
 
 	int totalimg = 0;
 	ColorRGB pixcol;
@@ -75,7 +75,7 @@ void train::trainpixelavg()
 					h = image.rows();
 					w = image.columns();
 
-					cout << "[Joker] Detected dimension: " << h << "*" << w << endl;
+					cout << "[Joker] Detected dimension: " << h << "*" << w << "\n" << endl;
 				}
 				else if (image.rows() != h || image.columns() != w)
 				{
@@ -132,13 +132,14 @@ void train::trainpixelavg()
 
 	}
 	cout << "model size: " << model.size() << endl;
+
+
+	/*
 	for (int l = 0; l < 1600; l++)
 	{
 		cout << model.at(l) << endl;
 	}
-
-
-
+	*/
 	/*
 	for (int i = 0; i < map.size(); i++)
 	{
