@@ -31,6 +31,7 @@ class joker
 
 
 		void loadmodel();
+		int loadimage();
 		void ocrpixelavg();
 
     public:

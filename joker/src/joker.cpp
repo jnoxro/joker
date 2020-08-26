@@ -13,6 +13,7 @@
 #include <Magick++.h>
 #include <vector>
 #include <string>
+#include <thread>
 
 #include "joker.h"
 #include "imggrab.h"
@@ -103,15 +104,26 @@ void joker::loadmodel()
 
 	if (modeltype == "pixelaverage")
 	{
-		ocrpixelavg();
+		if (loadimage() == 1)
+		{
+			ocrpixelavg();
+		}
+
 	}
 }
 
-void joker::ocrpixelavg()
+
+
+int joker::loadimage()
 {
 	imggrab fetcher;
-
-	if (fetcher.grab(filepath) == 1)
+	if (fetcher.grab(filepath) == 0)
+	{
+		cerr << "[Joker] Error: image load fail" << endl;
+		exit(EXIT_FAILURE);
+		return 0;
+	}
+	else
 	{
 		image = fetcher.give();
 		image.negate();
@@ -120,51 +132,42 @@ void joker::ocrpixelavg()
 			cerr << "[Joker] Error: Image does not match model dimensions" << endl;
 			exit(EXIT_FAILURE);
 		}
+	}
 
-		ColorRGB pixcol;
-		int score = 0;
-		int tempscore = 0;
-		string letter;
-		for (unsigned int i = 0; i < map.size(); i++)
-		{
-			tempscore = 0;
-			for (unsigned int j = 0; j < h; j++)
-			{
-				for (unsigned int k = 0; k < w; k++)
-				{
-					pixcol = image.pixelColor(k,j);  //flipped j,k so model is height * width
-					tempscore = tempscore + (pixcol.red() * model.at((i*w*h)+(j*w)+k));
-				}
-			}
-			if (tempscore > score)
-			{
-				score = tempscore;
-				letter  = map[i];
-			}
-			//cout << map[i] << " | " << tempscore << endl;
-		}
-		cout << letter << endl;
-		//cout << score << endl;
+	return 1;
+}
 
 
-/*
-		int p = 0;
+
+void joker::ocrpixelavg()
+{
+
+	ColorRGB pixcol;
+	int score = 0;
+	int tempscore = 0;
+	string letter;
+	for (unsigned int i = 0; i < map.size(); i++)
+	{
+		tempscore = 0;
 		for (unsigned int j = 0; j < h; j++)
 		{
 			for (unsigned int k = 0; k < w; k++)
 			{
-				cout << setw(3) << model.at(((1)*h*w)+(j*w)+k);
-				p++;
-				if (p == 40)
-				{
-					cout << "\n";
-					p = 0;
-				}
+				pixcol = image.pixelColor(k,j);  //flipped j,k so model is height * width
+				tempscore = tempscore + (pixcol.red() * model.at((i*w*h)+(j*w)+k));
 			}
 		}
-		*/
-
+		if (tempscore > score)
+		{
+			score = tempscore;
+			letter  = map[i];
+		}
+		//cout << map[i] << " | " << tempscore << endl;
 	}
+	cout << letter << endl;
+	//cout << score << endl;
+
+
 }
 
 
