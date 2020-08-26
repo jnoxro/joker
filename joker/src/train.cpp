@@ -6,6 +6,11 @@
 // Description : Train Joker models using various methodologies
 //============================================================================
 
+
+//TODO
+// .jkr file -> some arrangement of all matrices
+// first lines of file specify matrix size, methodology type etc
+
 #include <iostream>
 #include <stdlib.h>
 #include <fstream>
@@ -54,6 +59,8 @@ void train::trainpixelavg()
 	cout << "[Joker] Library size:   " << map.size()-1 << endl;
 	cout << "[Joker] File Extension: " << map[0] << "\n" << endl;
 
+	int totalimg = 0;
+	ColorRGB pixcol;
 	for (long unsigned int i = 1; i < map.size(); i++)
 	{
 		int counter = 0;
@@ -67,6 +74,7 @@ void train::trainpixelavg()
 				{
 					h = image.rows();
 					w = image.columns();
+
 					cout << "[Joker] Detected dimension: " << h << "*" << w << endl;
 				}
 				else if (image.rows() != h || image.columns() != w)
@@ -75,25 +83,53 @@ void train::trainpixelavg()
 					exit(EXIT_FAILURE);
 				}
 
-
-				// .jkr file -> some arrangement of all matrices
-				// first lines of file specify matrix size, methodology type etc
-				// crop to smallest image - trim model or latest image unless big difference then skip
-
-
 				image.threshold(125);
 
-				ColorRGB pixcol = image.pixelColor(12,1);
-				cout << pixcol.red() << " " << pixcol.blue() << " " << pixcol.green() << endl;
+				//nasty code for now
+				//pixelColor is slow should use magick++ image cache
+				for (int j = 0; j < h-1; j++)
+				{
+					for (int k = 0; k < w-1; k++)
+					{
+						pixcol = image.pixelColor(j,k);
+
+						if (pixcol.red() == 0)
+						{
+							if (counter == 0)
+							{
+								model.push_back(1);
+							}
+							else
+							{
+								model.at((j*(w-1))+k)++;
+							}
+						}
+						else
+						{
+							if (counter == 0)
+							{
+								model.push_back(0);
+							}
+						}
+
+
+					}
+				}
+
+				//ColorRGB pixcol = image.pixelColor(12,1);
+				//cout << pixcol.red() << " " << pixcol.blue() << " " << pixcol.green() << endl;
 
 
 				counter++;
 			}
 			else
 			{
+				totalimg = totalimg + counter;
+
 				cout << "[Joker] Loaded " << counter << " samples for " << map[i] << endl;
 				break;
 			}
+
 
 
 

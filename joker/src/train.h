@@ -28,9 +28,9 @@ class train
 		imggrab fetcher;
 
 		Magick::Image image;
-		//Magick::ColorMono pixval;
 
 		std::vector<std::string> map;
+		std::vector<int> model;
 
 
     public:
