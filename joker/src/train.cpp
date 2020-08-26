@@ -131,7 +131,27 @@ void train::trainpixelavg()
 		}
 
 	}
-	cout << "model size: " << model.size() << endl;
+
+	cout << "\n[Joker] Model created, saving as: " << newmodel << ".jkr" << endl;
+
+	ofstream output(newmodel + ".jkr");
+	output << "pixelaverage" << endl;
+	output << h << endl;
+	output << w << endl;
+	output << "map::" << endl; //map marker
+	for (long unsigned int g = 1; g < map.size(); g++)
+	{
+		output << map[g] << endl;
+	}
+	output << "model::" << endl; //model marker
+	for (long unsigned int h = 0; h < model.size(); h++)
+	{
+		output << model[h] << endl;
+	}
+	output.close();
+
+	cout << "[Joker] Model saved." << endl;
+
 
 /*
 	int p = 0;
