@@ -32,7 +32,7 @@ void joker::loadmodel()
 
 	//cout << "loading model" << endl;
 
-	ifstream input(modelname);
+	ifstream input(modelname + ".jkr");
 	if (!input.is_open())
 	{
 		cerr << "[Joker] Error: Unable to open model" << endl;
@@ -114,7 +114,7 @@ void joker::ocrpixelavg()
 	if (fetcher.grab(filepath) == 1)
 	{
 		image = fetcher.give();
-
+		image.negate();
 		if (image.rows() != h || image.columns() != w)
 		{
 			cerr << "[Joker] Error: Image does not match model dimensions" << endl;
@@ -141,9 +141,28 @@ void joker::ocrpixelavg()
 				score = tempscore;
 				letter  = map[i];
 			}
+			//cout << map[i] << " | " << tempscore << endl;
 		}
 		cout << letter << endl;
-		cout << score << endl;
+		//cout << score << endl;
+
+
+/*
+		int p = 0;
+		for (unsigned int j = 0; j < h; j++)
+		{
+			for (unsigned int k = 0; k < w; k++)
+			{
+				cout << setw(3) << model.at(((1)*h*w)+(j*w)+k);
+				p++;
+				if (p == 40)
+				{
+					cout << "\n";
+					p = 0;
+				}
+			}
+		}
+		*/
 
 	}
 }

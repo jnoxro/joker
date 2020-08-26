@@ -38,7 +38,7 @@ int main(int argc, const char* argv[]) {
 
 	//defaults//
 	string filepath = "test.jpg";
-	string modelpath = "model.jkr";
+	string modelpath = "mymodel";
 	string datapath = "data";
 	string newmodel = "mymodel";
 	int repeat = 0;
@@ -115,17 +115,9 @@ int main(int argc, const char* argv[]) {
 	if (mode == 1)
 	{
 		auto start = high_resolution_clock::now();
+
 		joker ocr(modelpath, repeat, filepath);
-		//ocr time
-		if (repeat == 0)
-		{
-			cout << "[Joker] ocr" << endl;
-		}
-		else
-		{
-			//ocr in loop and wait for file name
-			cout << "[Joker] repeat ocr" << endl;
-		}
+
 		auto stop = high_resolution_clock::now();
 		auto duration = duration_cast<milliseconds>(stop - start);
 
@@ -154,10 +146,10 @@ void welcome()
 
 
 	cout << "\n[Joker] OCR launch flags:\n" << endl;
-	cout << "[Joker] -o OCR mode       | -o" << endl;
-	cout << "[Joker] -r repeat mode    | -r" << endl;
-	cout << "[Joker] -i image filepath | -i test.jpg" << endl;
-	cout << "[Joker] -m model filepath | -m model.jkr" << endl;
+	cout << "[Joker] -o OCR mode		| -o" << endl;
+	cout << "[Joker] -r repeat mode		| -r" << endl;
+	cout << "[Joker] -i image filepath	| -i test.jpg" << endl;
+	cout << "[Joker] -m model name		| -m mymodel" << endl;
 
 
 	cout << "\n[Joker] Training launch flags:\n" << endl;
