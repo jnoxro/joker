@@ -12,6 +12,7 @@
 // first lines of file specify matrix size, methodology type etc
 
 #include <iostream>
+#include <iomanip>
 #include <stdlib.h>
 #include <fstream>
 #include <Magick++.h>
@@ -123,7 +124,6 @@ void train::trainpixelavg()
 			else
 			{
 				totalimg = totalimg + counter;
-
 				cout << "[Joker] Loaded " << counter << " samples for " << map[i] << endl;
 				break;
 			}
@@ -134,12 +134,20 @@ void train::trainpixelavg()
 	cout << "model size: " << model.size() << endl;
 
 
-	/*
+	int p = 0;
 	for (int l = 0; l < 1600; l++)
 	{
-		cout << model.at(l) << endl;
+		cout << setw(3) << model.at(l);
+		if (p == 40)
+		{
+			cout << "\n";
+			p = 0;
+		}
+		p++;
 	}
-	*/
+
+
+
 	/*
 	for (int i = 0; i < map.size(); i++)
 	{
