@@ -8,8 +8,7 @@
 
 
 //TODO
-// .jkr file -> some arrangement of all matrices
-// first lines of file specify matrix size, methodology type etc
+// separate save function
 
 #include <iostream>
 #include <iomanip>
@@ -87,7 +86,7 @@ void train::trainpixelavg()
 				image.threshold(125);
 
 				//nasty code for now
-				//pixelColor is slow should use magick++ image cache
+				//pixelColor on image itself is slow should use image cache
 				for (unsigned int j = 0; j < h; j++)
 				{
 					for (unsigned int k = 0; k < w; k++)

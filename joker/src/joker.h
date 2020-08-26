@@ -11,14 +11,22 @@
 
 #include <Magick++.h>
 #include <string>
+#include <vector>
 
 class joker
 {
 
     private:
+		std::vector<int> model;
+		std::vector<std::string> map;
+
+		std::string modelname;
+		std::string modeltype;
+
+		void loadmodel();
 
     public:
-        joker();  //constructor
+        joker(std::string modeln);  //constructor
 
 
 
