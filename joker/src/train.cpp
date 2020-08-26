@@ -150,7 +150,7 @@ void train::trainpixelavg()
 	}
 	output.close();
 
-	cout << "[Joker] Model saved." << endl;
+	cout << "[Joker] Model saved" << endl;
 
 
 /*

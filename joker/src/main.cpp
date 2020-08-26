@@ -146,12 +146,15 @@ void welcome()
 
 	cout << "\n[Joker] OCR launch flags:\n" << endl;
 	cout << "[Joker] -o OCR mode       | -o" << endl;
+	cout << "[Joker] -r repeat mode    | -r" << endl;
 	cout << "[Joker] -i image filepath | -i test.jpg" << endl;
 	cout << "[Joker] -m model filepath | -m model.jkr" << endl;
-	cout << "[Joker] -r repeat mode    | -r" << endl;
+
 
 	cout << "\n[Joker] Training launch flags:\n" << endl;
 	cout << "[Joker] -t train mode     | -t" << endl;
 	cout << "[Joker] -d data folder    | -d data" << endl;
 	cout << "[Joker] -n new model name | -n mymodel" << endl;
+
+	cout << "\n\n[Joker] Jack Orton	  https://github.com/jnoxro/joker" << endl;
 }
