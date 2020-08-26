@@ -162,6 +162,13 @@ void train::trainpixelavg()
 	}
 	*/
 
+	/*
+	for (int v = 0; v < 40; v++)
+	{
+		cout << v << endl;
+	}
+	*/
+
 }
 
 
