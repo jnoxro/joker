@@ -60,8 +60,8 @@ void train::trainpixelavg()
 	cout << "[Joker] Library size:   " << map.size()-1 << endl;
 	cout << "[Joker] File Extension: " << map[0] << endl;
 
-	int totalimg = 0;
 	ColorRGB pixcol;
+	int lettercount = 0;
 	for (long unsigned int i = 1; i < map.size(); i++)
 	{
 		int counter = 0;
@@ -92,7 +92,7 @@ void train::trainpixelavg()
 				{
 					for (unsigned int k = 0; k < w; k++)
 					{
-						pixcol = image.pixelColor(j,k);
+						pixcol = image.pixelColor(k,j);  //flipped j,k so model is height * width
 
 						if (pixcol.red() == 0)
 						{
@@ -102,7 +102,7 @@ void train::trainpixelavg()
 							}
 							else
 							{
-								model.at((j*(w))+k)++;
+								model.at((lettercount*h*w)+(j*w)+k)++;
 							}
 						}
 						else
@@ -123,8 +123,8 @@ void train::trainpixelavg()
 			}
 			else
 			{
-				totalimg = totalimg + counter;
 				cout << "[Joker] Loaded " << counter << " samples for " << map[i] << endl;
+				lettercount++;
 				break;
 			}
 
@@ -133,9 +133,10 @@ void train::trainpixelavg()
 	}
 	cout << "model size: " << model.size() << endl;
 
-
+/*
 	int p = 0;
-	for (int l = 0; l < 1600; l++)
+	int o = 0;
+	for (int l = 0; l < 8000; l++)
 	{
 		cout << setw(3) << model.at(l);
 		if (p == 40)
@@ -143,9 +144,15 @@ void train::trainpixelavg()
 			cout << "\n";
 			p = 0;
 		}
+		if (o == 1600)
+		{
+			cout << "\n\n";
+			o = 0;
+		}
+		o++;
 		p++;
 	}
-
+*/
 
 
 	/*
