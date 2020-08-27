@@ -28,12 +28,13 @@ using namespace std;
 using namespace std::chrono;
 using namespace Magick;
 
-joker::joker(string modeln, int repeat, int threadmode, std::string imgpath, int verb) //initialise
+joker::joker(string modeln, int rep, int threadmode, std::string imgpath, int verb) //initialise
 {
 	modelname = modeln;
 	filepath = imgpath;
 	threading = threadmode;
 	verbose = verb;
+	repeat = rep;
 	loadmodel();
 	initocr();
 }
@@ -122,30 +123,45 @@ void joker::loadmodel()
 void joker::initocr()
 {
 
-	auto start = high_resolution_clock::now();
-
-
 	if (modeltype == "pixelaverage")
 	{
-		if (loadimage() == 1)
+		if (repeat == 0)
 		{
-
-			if (threading == 1)
+			if (loadimage() == 1)
 			{
-				threadtest();
-			}
-			else
-			{
-				ocrpixelavg();
+				if (threading == 1)
+				{
+					threadtest();
+				}
+				else
+				{
+					ocrpixelavg();
+				}
 			}
 		}
-	}
+		else if (repeat == 1)
+		{
+			while (1)
+			{
+				cin >> filepath;
+				if (filepath == "exit")
+				{
+					exit(EXIT_SUCCESS);
+				}
+				if (loadimage() == 1)
+				{
+					if (threading == 1)
+					{
+						threadtest();
+					}
+					else
+					{
+						ocrpixelavg();
+					}
+				}
+			}
+		}
 
-	if (verbose == 1)
-	{
-		auto stop = high_resolution_clock::now();
-		auto duration = duration_cast<milliseconds>(stop - start);
-		cout <<  "Raw OCR time: "<< duration.count() << " millisecs" <<endl;
 	}
 }
 
@@ -190,6 +206,8 @@ int joker::loadimage()
 void joker::ocrpixelavg()
 {
 
+	auto ocrstart = high_resolution_clock::now();
+
 	ColorRGB pixcol;
 	int score = -32000;
 	int tempscore = 0;
@@ -214,6 +232,13 @@ void joker::ocrpixelavg()
 	}
 	cout << letter << endl;
 	//cout << score << endl;
+
+	if (verbose == 1)
+	{
+		auto ocrstop = high_resolution_clock::now();
+		auto duration = duration_cast<milliseconds>(ocrstop - ocrstart);
+		cout <<  "Raw OCR time: "<< duration.count() << " millisecs" <<endl;
+	}
 
 }
 
@@ -275,6 +300,7 @@ void joker::threadtest()
 
 void joker::ocrpixelavgthreaded(int start, int end, int id)
 {
+	auto ocrstart = high_resolution_clock::now();
 
 	ColorRGB pixcol;
 	unsigned int nh = image.rows();
@@ -303,6 +329,13 @@ void joker::ocrpixelavgthreaded(int start, int end, int id)
 	threadoutputs[letter] = score;
 	//cout << letter << endl;
 	//cout << score << endl;
+
+	if (verbose == 1)
+	{
+		auto ocrstop = high_resolution_clock::now();
+		auto duration = duration_cast<milliseconds>(ocrstop - ocrstart);
+		cout <<  "Raw OCR time: "<< duration.count() << " millisecs" <<endl;
+	}
 
 }
 

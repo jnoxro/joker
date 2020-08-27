@@ -29,6 +29,7 @@ class joker
 		Magick::Image image;
 
 		int verbose;
+		int repeat;
 
 		unsigned int h;
 		unsigned int w;
@@ -52,7 +53,7 @@ class joker
 		void ocrpixelavgthreaded(int start, int end, int id);
 
     public:
-        joker(std::string modeln, int repeat, int threadmode, std::string imgpath, int verb);  //constructor
+        joker(std::string modeln, int rep, int threadmode, std::string imgpath, int verb);  //constructor
 
 
 

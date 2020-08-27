@@ -159,7 +159,7 @@ void welcome()
 
 	cout << "\n[Joker] OCR launch flags:\n" << endl;
 	cout << "[Joker] -o OCR mode		| -o" << endl;
-	cout << "[Joker] -r repeat mode		| -r" << endl;
+	cout << "[Joker] -r repeat mode		| -r         | to exit type 'exit'" << endl;
 	cout << "[Joker] -thread threading	| -thread" << endl;
 	cout << "[Joker] -v verbose	        | -v" << endl;
 	cout << "[Joker] -i image filepath	| -i test.jpg" << endl;
