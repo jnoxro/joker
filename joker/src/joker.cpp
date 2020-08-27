@@ -19,11 +19,13 @@
 #include <vector>
 #include <string>
 #include <thread>
+#include <chrono>
 
 #include "joker.h"
 #include "imggrab.h"
 
 using namespace std;
+using namespace std::chrono;
 using namespace Magick;
 
 joker::joker(string modeln, int mode, std::string imgpath) //initialise
@@ -111,13 +113,23 @@ void joker::loadmodel()
 	{
 		if (loadimage() == 1)
 		{
-			ocrpixelavg();
+			auto start = high_resolution_clock::now();
+
+
+			//ocrpixelavg();
+
+			//cout << "\nThread test:\n" << endl;
+			threadtest();
+
+			auto stop = high_resolution_clock::now();
+			auto duration = duration_cast<milliseconds>(stop - start);
+
+			cout <<  "Raw OCR time: "<< duration.count() << " millisecs" <<endl;
 		}
 
 	}
 
-	cout << "\nThread test:\n" << endl;
-	threadtest();
+
 }
 
 
@@ -177,19 +189,66 @@ void joker::ocrpixelavg()
 	cout << letter << endl;
 	//cout << score << endl;
 
-
 }
+
 
 void joker::threadtest()
 {
 	int threadnum = thread::hardware_concurrency();
 	cout << "possible concurrent threads: " << threadnum << endl;
 
-	thread workers[threadnum];
+	for (unsigned int ms = 0; ms < map.size(); ms++)
+	{
+		threadoutputs.push_back(0); //expand output storage to correct size
+	}
 
+	thread worker1(&joker::ocrpixelavgthreaded, this, 0, 6, 1);
+	thread worker2(&joker::ocrpixelavgthreaded, this, 7, 13, 2);
+	thread worker3(&joker::ocrpixelavgthreaded, this, 14, 20, 3);
+	thread worker4(&joker::ocrpixelavgthreaded, this, 21, 25, 4);
+
+	worker1.join();
+	worker2.join();
+	worker3.join();
+	worker4.join();
+
+	for (unsigned int f = 0; f < threadoutputs.size(); f++)
+	{
+		cout << map.at(f) << " " << threadoutputs.at(f) << endl;
+
+	}
 }
 
+void joker::ocrpixelavgthreaded(int start, int end, int id)
+{
 
+	ColorRGB pixcol;
+	int score = 0;
+	int tempscore = 0;
+	int letter;
+	for (int i = start; i <= end; i++)
+	{
+		tempscore = 0;
+		for (unsigned int j = 0; j < h; j++)
+		{
+			for (unsigned int k = 0; k < w; k++)
+			{
+				pixcol = image.pixelColor(k,j);  //flipped j,k so model is height * width
+				tempscore = tempscore + (((2*pixcol.red())-1) * model.at((i*w*h)+(j*w)+k));
+			}
+		}
+		if (tempscore > score)
+		{
+			score = tempscore;
+			letter  = i;
+		}
+		cout << "Thread " << id << ":: 	" << map[i] << " | " << tempscore << endl;
+	}
+	threadoutputs[letter] = score;
+	//cout << letter << endl;
+	//cout << score << endl;
+
+}
 
 
 

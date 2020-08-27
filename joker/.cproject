@@ -43,7 +43,7 @@
                             							
                             <tool id="cdt.managedbuild.tool.gnu.cpp.compiler.exe.debug.1742426283" name="GCC C++ Compiler" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.exe.debug">
                                 								
-                                <option id="gnu.cpp.compiler.exe.debug.option.optimization.level.889486723" name="Optimization Level" superClass="gnu.cpp.compiler.exe.debug.option.optimization.level" useByScannerDiscovery="false" value="gnu.cpp.compiler.optimization.level.none" valueType="enumerated"/>
+                                <option id="gnu.cpp.compiler.exe.debug.option.optimization.level.889486723" name="Optimization Level" superClass="gnu.cpp.compiler.exe.debug.option.optimization.level" useByScannerDiscovery="false" value="gnu.cpp.compiler.optimization.level.most" valueType="enumerated"/>
                                 								
                                 <option defaultValue="gnu.cpp.compiler.debugging.level.max" id="gnu.cpp.compiler.exe.debug.option.debugging.level.1698276965" name="Debug Level" superClass="gnu.cpp.compiler.exe.debug.option.debugging.level" useByScannerDiscovery="false" valueType="enumerated"/>
                                 								
@@ -55,7 +55,7 @@
                                 								
                                 <option id="gnu.cpp.compiler.option.other.other.1281010245" name="Other flags" superClass="gnu.cpp.compiler.option.other.other" useByScannerDiscovery="false" value="-c -fmessage-length=0 `GraphicsMagick++-config --cppflags --cxxflags`" valueType="string"/>
                                 								
-                                <option id="gnu.cpp.compiler.option.pthread.693838430" superClass="gnu.cpp.compiler.option.pthread" useByScannerDiscovery="false" value="true" valueType="boolean"/>
+                                <option id="gnu.cpp.compiler.option.pthread.693838430" name="Support for pthread (-pthread)" superClass="gnu.cpp.compiler.option.pthread" useByScannerDiscovery="false" value="true" valueType="boolean"/>
                                 								
                                 <inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.394357289" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
                                 							
@@ -81,7 +81,7 @@
                                 								
                                 <option id="gnu.cpp.link.option.flags.1071159735" name="Linker flags" superClass="gnu.cpp.link.option.flags" useByScannerDiscovery="false" value="`GraphicsMagick++-config --ldflags --libs`" valueType="string"/>
                                 								
-                                <option id="gnu.cpp.link.option.pthread.259532936" superClass="gnu.cpp.link.option.pthread" useByScannerDiscovery="false" value="true" valueType="boolean"/>
+                                <option id="gnu.cpp.link.option.pthread.259532936" name="Support for pthread (-pthread)" superClass="gnu.cpp.link.option.pthread" useByScannerDiscovery="false" value="true" valueType="boolean"/>
                                 								
                                 <inputType id="cdt.managedbuild.tool.gnu.cpp.linker.input.680355743" superClass="cdt.managedbuild.tool.gnu.cpp.linker.input">
                                     									
