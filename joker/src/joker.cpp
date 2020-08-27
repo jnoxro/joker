@@ -115,6 +115,9 @@ void joker::loadmodel()
 		}
 
 	}
+
+	cout << "\nThread test:\n" << endl;
+	threadtest();
 }
 
 
@@ -131,7 +134,9 @@ int joker::loadimage()
 	else
 	{
 		image = fetcher.give();
-		image.negate();
+
+		image.threshold(125);
+		//image.negate();
 		if (image.rows() != h || image.columns() != w)
 		{
 			cerr << "[Joker] Error: Image does not match model dimensions" << endl;
@@ -159,7 +164,7 @@ void joker::ocrpixelavg()
 			for (unsigned int k = 0; k < w; k++)
 			{
 				pixcol = image.pixelColor(k,j);  //flipped j,k so model is height * width
-				tempscore = tempscore + (pixcol.red() * model.at((i*w*h)+(j*w)+k));
+				tempscore = tempscore + (((2*pixcol.red())-1) * model.at((i*w*h)+(j*w)+k));
 			}
 		}
 		if (tempscore > score)
@@ -167,13 +172,24 @@ void joker::ocrpixelavg()
 			score = tempscore;
 			letter  = map[i];
 		}
-		//cout << map[i] << " | " << tempscore << endl;
+		cout << map[i] << " | " << tempscore << endl;
 	}
 	cout << letter << endl;
 	//cout << score << endl;
 
 
 }
+
+void joker::threadtest()
+{
+	int threadnum = thread::hardware_concurrency();
+	cout << "possible concurrent threads: " << threadnum << endl;
+
+	thread workers[threadnum];
+
+}
+
+
 
 
 

@@ -159,7 +159,7 @@ void train::savemodel(string mode)
 		output << "model::" << endl; //model marker
 		for (long unsigned int h = 0; h < model.size(); h++)
 		{
-			output << model[h] - 1 << endl; //-1 for negative scoring in white space
+			output << -(model[h] + 1) << endl; //-(m+1) for negative scoring in white space and non overlap
 		}
 		output.close();
 
