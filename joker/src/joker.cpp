@@ -28,17 +28,21 @@ using namespace std;
 using namespace std::chrono;
 using namespace Magick;
 
-joker::joker(string modeln, int mode, std::string imgpath) //initialise
+joker::joker(string modeln, int repeat, int threadmode, std::string imgpath, int verb) //initialise
 {
 	modelname = modeln;
 	filepath = imgpath;
+	threading = threadmode;
+	verbose = verb;
 	loadmodel();
+	initocr();
 }
 
 void joker::loadmodel()
 {
 
-	//cout << "loading model" << endl;
+	auto loadstart = high_resolution_clock::now();
+
 
 	ifstream input(modelname + ".jkr");
 	if (!input.is_open())
@@ -106,36 +110,51 @@ void joker::loadmodel()
 		}
 	}
 
-	//cout << "loaded model" << endl;
-	//cout << "model size: " << model.size() << endl;
+	if (verbose == 1)
+	{
+		auto loadstop = high_resolution_clock::now();
+		auto loadduration = duration_cast<milliseconds>(loadstop - loadstart);
+		cout <<  "model load time: "<< loadduration.count() << " millisecs" <<endl;
+	}
+
+}
+
+void joker::initocr()
+{
+
+	auto start = high_resolution_clock::now();
+
 
 	if (modeltype == "pixelaverage")
 	{
 		if (loadimage() == 1)
 		{
-			auto start = high_resolution_clock::now();
 
-
-			//ocrpixelavg();
-
-			//cout << "\nThread test:\n" << endl;
-			threadtest();
-
-			auto stop = high_resolution_clock::now();
-			auto duration = duration_cast<milliseconds>(stop - start);
-
-			cout <<  "Raw OCR time: "<< duration.count() << " millisecs" <<endl;
+			if (threading == 1)
+			{
+				threadtest();
+			}
+			else
+			{
+				ocrpixelavg();
+			}
 		}
-
 	}
 
-
+	if (verbose == 1)
+	{
+		auto stop = high_resolution_clock::now();
+		auto duration = duration_cast<milliseconds>(stop - start);
+		cout <<  "Raw OCR time: "<< duration.count() << " millisecs" <<endl;
+	}
 }
-
-
 
 int joker::loadimage()
 {
+
+	auto start = high_resolution_clock::now();
+
+
 	imggrab fetcher;
 	if (fetcher.grab(filepath) == 0)
 	{
@@ -156,6 +175,13 @@ int joker::loadimage()
 		}
 	}
 
+	if (verbose == 1)
+	{
+		auto stop = high_resolution_clock::now();
+		auto duration = duration_cast<milliseconds>(stop - start);
+		cout <<  "Image load time: "<< duration.count() << " millisecs" <<endl;
+	}
+
 	return 1;
 }
 
@@ -165,7 +191,7 @@ void joker::ocrpixelavg()
 {
 
 	ColorRGB pixcol;
-	int score = 0;
+	int score = -32000;
 	int tempscore = 0;
 	string letter;
 	for (unsigned int i = 0; i < map.size(); i++)
@@ -184,7 +210,7 @@ void joker::ocrpixelavg()
 			score = tempscore;
 			letter  = map[i];
 		}
-		cout << map[i] << " | " << tempscore << endl;
+		//cout << map[i] << " | " << tempscore << endl;
 	}
 	cout << letter << endl;
 	//cout << score << endl;
@@ -192,16 +218,41 @@ void joker::ocrpixelavg()
 }
 
 
+
+//Threading is definitely broken different scores each run
 void joker::threadtest()
 {
 	int threadnum = thread::hardware_concurrency();
+	cout << "threading is broken dont use" << endl;
 	cout << "possible concurrent threads: " << threadnum << endl;
+
+	vector<thread> workers;
+	int size = map.size();
 
 	for (unsigned int ms = 0; ms < map.size(); ms++)
 	{
 		threadoutputs.push_back(0); //expand output storage to correct size
 	}
 
+	for (int tc = 0; tc < threadnum; tc++)
+	{
+		int start = tc*(size/threadnum);
+		int end = (tc*(size/threadnum) + (size/threadnum));
+		if (tc == threadnum-1)
+		{
+			end = end + (size%threadnum);
+		}
+		workers.push_back(thread(&joker::ocrpixelavgthreaded, this, start, end, tc));
+		cout << tc << " " << start << " " << end << endl;
+	}
+
+	for (int tc = 0; tc < threadnum; tc++)
+	{
+		workers.at(tc).join();
+	}
+
+
+	/*
 	thread worker1(&joker::ocrpixelavgthreaded, this, 0, 6, 1);
 	thread worker2(&joker::ocrpixelavgthreaded, this, 7, 13, 2);
 	thread worker3(&joker::ocrpixelavgthreaded, this, 14, 20, 3);
@@ -211,30 +262,35 @@ void joker::threadtest()
 	worker2.join();
 	worker3.join();
 	worker4.join();
+	*/
 
+	/*
 	for (unsigned int f = 0; f < threadoutputs.size(); f++)
 	{
 		cout << map.at(f) << " " << threadoutputs.at(f) << endl;
 
 	}
+	*/
 }
 
 void joker::ocrpixelavgthreaded(int start, int end, int id)
 {
 
 	ColorRGB pixcol;
-	int score = 0;
+	unsigned int nh = image.rows();
+	unsigned int nw = image.columns();
+	int score = -32000;
 	int tempscore = 0;
 	int letter;
-	for (int i = start; i <= end; i++)
+	for (int i = start; i < end; i++)
 	{
 		tempscore = 0;
-		for (unsigned int j = 0; j < h; j++)
+		for (unsigned int j = 0; j < nh; j++)
 		{
-			for (unsigned int k = 0; k < w; k++)
+			for (unsigned int k = 0; k < nw; k++)
 			{
 				pixcol = image.pixelColor(k,j);  //flipped j,k so model is height * width
-				tempscore = tempscore + (((2*pixcol.red())-1) * model.at((i*w*h)+(j*w)+k));
+				tempscore = tempscore + (((2*pixcol.red())-1) * model.at((i*nw*nh)+(j*nw)+k));
 			}
 		}
 		if (tempscore > score)

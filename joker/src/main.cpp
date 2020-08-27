@@ -42,6 +42,8 @@ int main(int argc, const char* argv[]) {
 	string datapath = "data";
 	string newmodel = "mymodel";
 	int repeat = 0;
+	int threadmode = 0;
+	int verbose = 0;
 	int mode = 0;
 
 	void welcome();
@@ -80,6 +82,14 @@ int main(int argc, const char* argv[]) {
 					{
 						repeat = 1;
 					}
+					if (argu1 == "-thread")
+					{
+						threadmode = 1;
+					}
+					if (argu1 == "-v")
+					{
+						verbose = 1;
+					}
 				}
 			}
 			if (argu == "-t")
@@ -116,12 +126,14 @@ int main(int argc, const char* argv[]) {
 	{
 		auto start = high_resolution_clock::now();
 
-		joker ocr(modelpath, repeat, filepath);
+		joker ocr(modelpath, repeat, threadmode, filepath,  verbose);
 
-		auto stop = high_resolution_clock::now();
-		auto duration = duration_cast<milliseconds>(stop - start);
-
-		cout << duration.count() << " millisecs" <<endl;
+		if (verbose == 1)
+		{
+			auto stop = high_resolution_clock::now();
+			auto duration = duration_cast<milliseconds>(stop - start);
+			cout << "Joker time: " << duration.count() << " millisecs" <<endl;
+		}
 	}
 
 
@@ -148,6 +160,8 @@ void welcome()
 	cout << "\n[Joker] OCR launch flags:\n" << endl;
 	cout << "[Joker] -o OCR mode		| -o" << endl;
 	cout << "[Joker] -r repeat mode		| -r" << endl;
+	cout << "[Joker] -thread threading	| -thread" << endl;
+	cout << "[Joker] -v verbose	        | -v" << endl;
 	cout << "[Joker] -i image filepath	| -i test.jpg" << endl;
 	cout << "[Joker] -m model name		| -m mymodel" << endl;
 

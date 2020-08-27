@@ -28,12 +28,14 @@ class joker
 
 		Magick::Image image;
 
+		int verbose;
+
 		unsigned int h;
 		unsigned int w;
 
-
 		void loadmodel();
 		int loadimage();
+		void initocr();
 		void ocrpixelavg();
 
 
@@ -43,13 +45,14 @@ class joker
 		//each thread outputs the score for a letter in the letters respective map position
 		//EG if threadoutputs.at(4) = 5000 then the letter at map.at(4) has that score
 		// https://stackoverflow.com/questions/45720829/can-two-threads-write-to-different-element-of-the-same-array
+		int threading;
 		std::vector<int> threadoutputs;
 
 		void threadtest();
 		void ocrpixelavgthreaded(int start, int end, int id);
 
     public:
-        joker(std::string modeln, int mode, std::string imgpath);  //constructor
+        joker(std::string modeln, int repeat, int threadmode, std::string imgpath, int verb);  //constructor
 
 
 
