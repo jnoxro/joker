@@ -53,6 +53,8 @@ void joker::loadmodel()
 	}
 
 	int readmode = 0;
+	long inint;
+	long modelcounter = 0;
 	for(string line; getline( input, line ); )
 	{
 		if (readmode == 0)
@@ -107,7 +109,111 @@ void joker::loadmodel()
 				cout << line << endl;
 				exit(EXIT_FAILURE);
 			}
-			model.push_back(stoi(line));
+
+			inint = stol(line);
+			if (inint >= 0) //fill in model white space
+			{
+				for (int mc = modelcounter; mc < inint; mc++)
+				{
+					model.push_back(-1);
+					modelcounter++;
+				}
+			}
+			else
+			{
+				model.push_back(inint);
+				modelcounter++;
+			}
+
+		}
+	}
+	if (model.size() != (h*w*map.size())) //missing info
+	{
+		for (long unsigned int mc = modelcounter; mc < (h*w*map.size()); mc++)
+		{
+			model.push_back(-1);
+		}
+	}
+	//cout << model.size() << endl;
+
+	if (verbose == 1)
+	{
+		auto loadstop = high_resolution_clock::now();
+		auto loadduration = duration_cast<milliseconds>(loadstop - loadstart);
+		cout <<  "model load time: "<< loadduration.count() << " millisecs" <<endl;
+	}
+
+}
+
+void joker::loadmodelold()
+{
+
+	auto loadstart = high_resolution_clock::now();
+
+
+	ifstream input(modelname + ".jkr");
+	if (!input.is_open())
+	{
+		cerr << "[Joker] Error: Unable to open model" << endl;
+		exit(EXIT_FAILURE);
+	}
+
+	int readmode = 0;
+	for(string line; getline( input, line ); )
+	{
+		if (readmode == 0)
+		{
+			modeltype = line;
+			readmode = 1;
+			continue;
+		}
+		if (readmode == 1)
+		{
+			h = stoi(line);
+			readmode = 2;
+			continue;
+		}
+		if (readmode == 2)
+		{
+			w = stoi(line);
+			readmode = 3;
+			continue;
+		}
+		if (readmode == 3)
+		{
+			if (line == "map::")
+			{
+				readmode = 4;
+				continue;
+			}
+			else
+			{
+				cerr << "[Joker] Error: Model format error map::" << endl;
+				cout << line << endl;
+				exit(EXIT_FAILURE);
+			}
+		}
+		if (readmode == 4)
+		{
+			if (line == "model::")
+			{
+				readmode = 5;
+				continue;
+			}
+			else
+			{
+				map.push_back(line);
+			}
+		}
+		if (readmode == 5)
+		{
+			if (map.size() == 0)
+			{
+				cerr << "[Joker] Error: Model format error model::" << endl;
+				cout << line << endl;
+				exit(EXIT_FAILURE);
+			}
+			model.push_back(stol(line));
 		}
 	}
 
@@ -122,7 +228,7 @@ void joker::loadmodel()
 
 void joker::initocr()
 {
-
+	cout << modeltype << endl;
 	if (modeltype == "pixelaverage")
 	{
 		if (repeat == 0)

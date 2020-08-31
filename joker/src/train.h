@@ -33,6 +33,7 @@ class train
 		std::vector<int> model;
 
 		void savemodel(std::string mode);
+		void savemodelold(std::string mode);
 
     public:
 		train(std::string path, std::string name); //constructor

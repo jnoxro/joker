@@ -148,6 +148,44 @@ void train::savemodel(string mode)
 	if (mode == "pixelaverage")
 	{
 		ofstream output(newmodel + ".jkr");
+		output << mode << endl;
+		output << h << endl;
+		output << w << endl;
+		output << "map::" << endl; //map marker
+		for (long unsigned int g = 1; g < map.size(); g++)
+		{
+			output << map[g] << endl;
+		}
+		output << "model::" << endl; //model marker
+
+		int lastval = 0; //0 means empty pixel, 1 means info
+		for (long unsigned int h = 0; h < model.size(); h++)
+		{
+			if (model[h] == 0)
+			{
+				lastval = 0;
+			}
+			else
+			{
+				if (lastval == 0)
+				{
+					output << h << endl; //h will be a positive number so can be distinguished in model from pixel info
+					lastval = 1;
+				}
+				output << -(model[h]) << endl; //-(m) for negative scoring for lack of overlap
+			}
+		}
+		output.close();
+
+		cout << "[Joker] Model saved" << endl;
+	}
+}
+
+void train::savemodelold(string mode)
+{
+	if (mode == "pixelaverage")
+	{
+		ofstream output(newmodel + ".jkr");
 		output << "pixelaverage" << endl;
 		output << h << endl;
 		output << w << endl;

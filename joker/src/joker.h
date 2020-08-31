@@ -18,7 +18,7 @@ class joker
 {
 
     private:
-		std::vector<int> model;
+		std::vector<long> model;
 		std::vector<std::string> map;
 
 		std::string modelname;
@@ -35,6 +35,7 @@ class joker
 		unsigned int w;
 
 		void loadmodel();
+		void loadmodelold();
 		int loadimage();
 		void initocr();
 		void ocrpixelavg();
