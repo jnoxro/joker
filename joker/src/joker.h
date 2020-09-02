@@ -13,6 +13,7 @@
 #include <string>
 #include <vector>
 #include <thread>
+#include <mutex>
 
 class joker
 {
@@ -48,6 +49,8 @@ class joker
 		//EG if threadoutputs.at(4) = 5000 then the letter at map.at(4) has that score
 		// https://stackoverflow.com/questions/45720829/can-two-threads-write-to-different-element-of-the-same-array
 		int threading;
+
+		std::mutex mtx; //mutex for locking threads
 		std::vector<int> threadoutputs;
 
 		void threadtest();

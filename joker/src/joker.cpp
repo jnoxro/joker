@@ -8,7 +8,7 @@
 
 
 //TODO
-// - work queue of each letter score, thread pool works through
+// - Allow main script to call load model and init ocr separately
 
 
 #include <iostream>
@@ -20,6 +20,7 @@
 #include <string>
 #include <thread>
 #include <chrono>
+#include <mutex>
 
 #include "joker.h"
 #include "imggrab.h"
@@ -228,7 +229,6 @@ void joker::loadmodelold()
 
 void joker::initocr()
 {
-	cout << modeltype << endl;
 	if (modeltype == "pixelaverage")
 	{
 		if (repeat == 0)
@@ -242,6 +242,7 @@ void joker::initocr()
 				else
 				{
 					ocrpixelavg();
+					//ocrpixelavgthreaded(0, 26, 99);
 				}
 			}
 		}
@@ -300,14 +301,12 @@ int joker::loadimage()
 	if (verbose == 1)
 	{
 		auto stop = high_resolution_clock::now();
-		auto duration = duration_cast<milliseconds>(stop - start);
-		cout <<  "Image load time: "<< duration.count() << " millisecs" <<endl;
+		auto duration = duration_cast<microseconds>(stop - start);
+		cout <<  "Image load time: "<< duration.count() << " microsecs" <<endl;
 	}
 
 	return 1;
 }
-
-
 
 void joker::ocrpixelavg()
 {
@@ -337,7 +336,7 @@ void joker::ocrpixelavg()
 		//cout << map[i] << " | " << tempscore << endl;
 	}
 	cout << letter << endl;
-	//cout << score << endl;
+	cout << score << endl;
 
 	if (verbose == 1)
 	{
@@ -348,14 +347,16 @@ void joker::ocrpixelavg()
 
 }
 
-
-
-//Threading is definitely broken different scores each run
 void joker::threadtest()
 {
+	auto ocrstart = high_resolution_clock::now();
+
 	int threadnum = thread::hardware_concurrency();
-	cout << "threading is broken dont use" << endl;
-	cout << "possible concurrent threads: " << threadnum << endl;
+
+	if (verbose == 1)
+	{
+		cout << "[Joker] Possible concurrent threads: " << threadnum << endl;
+	}
 
 	vector<thread> workers;
 	int size = map.size();
@@ -374,7 +375,7 @@ void joker::threadtest()
 			end = end + (size%threadnum);
 		}
 		workers.push_back(thread(&joker::ocrpixelavgthreaded, this, start, end, tc));
-		cout << tc << " " << start << " " << end << endl;
+		//cout << tc << " " << start << " " << end << endl;
 	}
 
 	for (int tc = 0; tc < threadnum; tc++)
@@ -382,47 +383,92 @@ void joker::threadtest()
 		workers.at(tc).join();
 	}
 
-
-	/*
-	thread worker1(&joker::ocrpixelavgthreaded, this, 0, 6, 1);
-	thread worker2(&joker::ocrpixelavgthreaded, this, 7, 13, 2);
-	thread worker3(&joker::ocrpixelavgthreaded, this, 14, 20, 3);
-	thread worker4(&joker::ocrpixelavgthreaded, this, 21, 25, 4);
-
-	worker1.join();
-	worker2.join();
-	worker3.join();
-	worker4.join();
-	*/
-
-	/*
-	for (unsigned int f = 0; f < threadoutputs.size(); f++)
+	long score = -100000;
+	int pos = 0;
+	for (unsigned int ms = 0; ms < map.size(); ms++)
 	{
-		cout << map.at(f) << " " << threadoutputs.at(f) << endl;
-
+		if (threadoutputs.at(ms) > score)
+		{
+			score = threadoutputs.at(ms);
+			pos = ms;
+		}
 	}
-	*/
+	cout << map.at(pos) << " " << score << endl;
+
+	if (verbose == 1)
+	{
+		auto ocrstop = high_resolution_clock::now();
+		auto duration = duration_cast<milliseconds>(ocrstop - ocrstart);
+		cout <<  "Raw threaded OCR time: "<< duration.count() << " millisecs" <<endl;
+	}
+
 }
 
 void joker::ocrpixelavgthreaded(int start, int end, int id)
 {
-	auto ocrstart = high_resolution_clock::now();
 
+//	PixelPacket *pixels = test.getPixels(0,0,40,40);
+//	cout << (int)pixels[w*h].red << endl;
+
+//	vector<int> big_vector = {5,12,4,6,7,8,9,9,31,1,1,5,76,78,8};
+//	vector<int> subvector = {big_vector.begin() + 3, big_vector.end() - 2};
+
+//	pixcol = image.pixelColor(k,j);  //flipped j,k so model is height * width
+//	tempscore = tempscore + (((2*pixcol.red())-1) * model.at((i*w*h)+(j*w)+k));
+
+	mtx.lock();
+	PixelPacket *pixels = image.getPixels(0, 0, image.columns(), image.rows());
+	mtx.unlock();
+
+	mtx.lock();
+	vector<int> submodel = { (model.begin() + (start*h*w)) , (model.begin() + (end*w*h)) };
+	mtx.unlock();
+
+	long score = -100000;
+	long tempscore = 0;
+	int letter = 0;
+
+	for (int i = 0; i < end-start; i++)
+	{
+		for (long iter = 0; iter < w*h; iter++)
+		{
+			tempscore = tempscore + (((((int)pixels[iter].red)/255)*2)-1) * submodel.at((i*w*h) + iter);
+		}
+
+		if (verbose == 1)
+		{
+			mtx.lock();
+			cout << "Thread " << id << ":: 	" << map[start+i] << " | " << tempscore << endl;
+			mtx.unlock();
+		}
+
+		if (tempscore > score)
+		{
+			score = tempscore;
+			letter = start + i;
+		}
+	}
+	mtx.lock();
+	threadoutputs[letter] = score;
+	mtx.unlock();
+
+
+	/*
 	ColorRGB pixcol;
-	unsigned int nh = image.rows();
-	unsigned int nw = image.columns();
 	int score = -32000;
 	int tempscore = 0;
-	int letter;
+	int letter = 0;
 	for (int i = start; i < end; i++)
 	{
 		tempscore = 0;
-		for (unsigned int j = 0; j < nh; j++)
+		for (unsigned int j = 0; j < h; j++)
 		{
-			for (unsigned int k = 0; k < nw; k++)
+			for (unsigned int k = 0; k < w; k++)
 			{
+				mtx.lock();
 				pixcol = image.pixelColor(k,j);  //flipped j,k so model is height * width
-				tempscore = tempscore + (((2*pixcol.red())-1) * model.at((i*nw*nh)+(j*nw)+k));
+				tempscore = tempscore + (((2*pixcol.red())-1) * model.at((i*w*h)+(j*w)+k));
+				mtx.unlock();
 			}
 		}
 		if (tempscore > score)
@@ -430,19 +476,18 @@ void joker::ocrpixelavgthreaded(int start, int end, int id)
 			score = tempscore;
 			letter  = i;
 		}
-		cout << "Thread " << id << ":: 	" << map[i] << " | " << tempscore << endl;
+		if (verbose == 1)
+		{
+			cout << "Thread " << id << ":: 	" << map[i] << " | " << tempscore << endl;
+		}
 	}
+	mtx.lock();
 	threadoutputs[letter] = score;
+	mtx.unlock();
 	//cout << letter << endl;
 	//cout << score << endl;
 
-	if (verbose == 1)
-	{
-		auto ocrstop = high_resolution_clock::now();
-		auto duration = duration_cast<milliseconds>(ocrstop - ocrstart);
-		cout <<  "Raw OCR time: "<< duration.count() << " millisecs" <<endl;
-	}
-
+	*/
 }
 
 
