@@ -124,9 +124,12 @@ int main(int argc, const char* argv[]) {
 
 	if (mode == 1)
 	{
+
+
 		auto start = high_resolution_clock::now();
 
-		joker ocr(modelpath, repeat, threadmode, filepath,  verbose);
+		joker ocr(modelpath, repeat, threadmode, verbose);
+		ocr.initocr(filepath);
 
 		if (verbose == 1)
 		{
@@ -134,6 +137,7 @@ int main(int argc, const char* argv[]) {
 			auto duration = duration_cast<milliseconds>(stop - start);
 			cout << "Joker time: " << duration.count() << " millisecs" <<endl;
 		}
+
 	}
 
 

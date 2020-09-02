@@ -38,7 +38,6 @@ class joker
 		void loadmodel();
 		void loadmodelold();
 		int loadimage();
-		void initocr();
 		void ocrpixelavg();
 
 
@@ -57,7 +56,8 @@ class joker
 		void ocrpixelavgthreaded(int start, int end, int id);
 
     public:
-        joker(std::string modeln, int rep, int threadmode, std::string imgpath, int verb);  //constructor
+		void initocr(std::string imagepath);
+        joker(std::string modeln, int rep, int threadmode, int verb);  //constructor
 
 
 

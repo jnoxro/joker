@@ -29,15 +29,14 @@ using namespace std;
 using namespace std::chrono;
 using namespace Magick;
 
-joker::joker(string modeln, int rep, int threadmode, std::string imgpath, int verb) //initialise
+joker::joker(string modeln, int rep, int threadmode,  int verb) //initialise
 {
 	modelname = modeln;
-	filepath = imgpath;
+
 	threading = threadmode;
 	verbose = verb;
 	repeat = rep;
 	loadmodel();
-	initocr();
 }
 
 void joker::loadmodel()
@@ -227,8 +226,10 @@ void joker::loadmodelold()
 
 }
 
-void joker::initocr()
+void joker::initocr(string imagepath)
 {
+	filepath = imagepath;
+
 	if (modeltype == "pixelaverage")
 	{
 		if (repeat == 0)
@@ -336,7 +337,6 @@ void joker::ocrpixelavg()
 		//cout << map[i] << " | " << tempscore << endl;
 	}
 	cout << letter << endl;
-	cout << score << endl;
 
 	if (verbose == 1)
 	{
@@ -375,7 +375,7 @@ void joker::threadtest()
 			end = end + (size%threadnum);
 		}
 		workers.push_back(thread(&joker::ocrpixelavgthreaded, this, start, end, tc));
-		//cout << tc << " " << start << " " << end << endl;
+		//cout << tc << " " << start << " " << end << endl; //show task assignments
 	}
 
 	for (int tc = 0; tc < threadnum; tc++)
@@ -385,15 +385,19 @@ void joker::threadtest()
 
 	long score = -100000;
 	int pos = 0;
+
 	for (unsigned int ms = 0; ms < map.size(); ms++)
 	{
-		if (threadoutputs.at(ms) > score)
+		//uncomment to see received high scores (1 per thread):
+		//cout << map.at(ms) << " " << threadoutputs.at(ms) << endl;
+
+		if (threadoutputs.at(ms) > score && threadoutputs.at(ms) != 0)
 		{
 			score = threadoutputs.at(ms);
 			pos = ms;
 		}
 	}
-	cout << map.at(pos) << " " << score << endl;
+	cout << map.at(pos) << endl;
 
 	if (verbose == 1)
 	{
@@ -406,7 +410,7 @@ void joker::threadtest()
 
 void joker::ocrpixelavgthreaded(int start, int end, int id)
 {
-
+/*
 //	PixelPacket *pixels = test.getPixels(0,0,40,40);
 //	cout << (int)pixels[w*h].red << endl;
 
@@ -415,6 +419,7 @@ void joker::ocrpixelavgthreaded(int start, int end, int id)
 
 //	pixcol = image.pixelColor(k,j);  //flipped j,k so model is height * width
 //	tempscore = tempscore + (((2*pixcol.red())-1) * model.at((i*w*h)+(j*w)+k));
+*/
 
 	mtx.lock();
 	PixelPacket *pixels = image.getPixels(0, 0, image.columns(), image.rows());
@@ -424,9 +429,98 @@ void joker::ocrpixelavgthreaded(int start, int end, int id)
 	vector<int> submodel = { (model.begin() + (start*h*w)) , (model.begin() + (end*w*h)) };
 	mtx.unlock();
 
+	/*
+	if (id == 2)
+	{
+		mtx.lock();
+
+		//image check
+		int counter = 0;
+		for (long iter = 0; iter < w*h; iter++)
+		{
+			if (counter == 40)
+			{
+				cout << "\n";
+				counter = 0;
+			}
+			cout << setw(3) << (((((int)pixels[iter].red)/255)*2)-1);
+			counter++;
+
+		}
+		cout << "\n\n\n" << endl;
+		mtx.unlock();
+	}
+
+	mtx.lock();
+
+	cout << "\n\nID: " << id << "\n\n" << endl;
+	int counter = 0;
+	long counter2 = 0;
+	for (long iter = 0; iter < w*h*(end-start); iter++)
+	{
+		if (counter == 40)
+		{
+			cout << "\n";
+			counter = 0;
+		}
+		if (counter2 == w*h)
+		{
+			cout << "\n\n" << endl;
+			counter2 = 0;
+		}
+
+		cout << setw(3) << submodel.at(iter);
+		counter++;
+		counter2++;
+	}
+
+	cout << "\n\n\n\n\n" << endl;
+
+	mtx.unlock();
+*/
+
 	long score = -100000;
 	long tempscore = 0;
 	int letter = 0;
+
+	long counter1 = 0; //to image pixel count
+	long counter2 = 0; //map pos counter
+	for (long iter = 0; iter < w*h*(end-start); iter++)
+	{
+		tempscore = tempscore + (((((int)pixels[counter1].red)/255)*2)-1) * submodel.at(iter);
+		counter1++;
+
+		if (counter1 == w*h) //||counter==0
+		{
+			if (tempscore > score)
+			{
+				score = tempscore;
+				letter = start + counter2;
+			}
+			if (verbose == 1 && counter1 > 0)
+			{
+				mtx.lock();
+				cout << "Thread " << id << ":: 	" << map[start+counter2] << " | " << tempscore << endl;
+				mtx.unlock();
+			}
+			if (counter1 != 0)
+			{
+				counter2++;
+			}
+			tempscore = 0;
+			counter1 = 0;
+
+		}
+
+
+	}
+
+	mtx.lock();
+	threadoutputs[letter] = score;
+	mtx.unlock();
+
+
+/*
 
 	for (int i = 0; i < end-start; i++)
 	{
@@ -451,7 +545,7 @@ void joker::ocrpixelavgthreaded(int start, int end, int id)
 	mtx.lock();
 	threadoutputs[letter] = score;
 	mtx.unlock();
-
+*/
 
 	/*
 	ColorRGB pixcol;
