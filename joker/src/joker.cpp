@@ -84,8 +84,7 @@ void joker::loadmodel()
 			}
 			else
 			{
-				cerr << "[Joker] Error: Model format error map::" << endl;
-				cout << line << endl;
+				cerr << "[Joker] Error: Model format error map:: line:" << line << endl;
 				exit(EXIT_FAILURE);
 			}
 		}
@@ -105,8 +104,7 @@ void joker::loadmodel()
 		{
 			if (map.size() == 0)
 			{
-				cerr << "[Joker] Error: Model format error model::" << endl;
-				cout << line << endl;
+				cerr << "[Joker] Error: Model format error model:: line:" << line << endl;
 				exit(EXIT_FAILURE);
 			}
 
@@ -140,7 +138,7 @@ void joker::loadmodel()
 	{
 		auto loadstop = high_resolution_clock::now();
 		auto loadduration = duration_cast<milliseconds>(loadstop - loadstart);
-		cout <<  "model load time: "<< loadduration.count() << " millisecs" <<endl;
+		cout <<  "[Joker] Model load time: "<< loadduration.count() << " millisecs" <<endl;
 	}
 
 }
@@ -303,7 +301,7 @@ int joker::loadimage()
 	{
 		auto stop = high_resolution_clock::now();
 		auto duration = duration_cast<microseconds>(stop - start);
-		cout <<  "Image load time: "<< duration.count() << " microsecs" <<endl;
+		cout <<  "[Joker] Image load time: "<< duration.count() << " microsecs" <<endl;
 	}
 
 	return 1;
@@ -311,7 +309,52 @@ int joker::loadimage()
 
 void joker::ocrpixelavg()
 {
+	auto ocrstart = high_resolution_clock::now();
+	PixelPacket *pixels = image.getPixels(0, 0, image.columns(), image.rows());
 
+	long score = -100000;
+	long tempscore = 0;
+	int letter = 0;
+
+	long counter1 = 0; //to image pixel count
+	long counter2 = 0; //map pos counter
+	for (long iter = 0; iter < w*h*((int)map.size()); iter++)
+	{
+		tempscore = tempscore + (((((int)pixels[counter1].red)/255)*2)-1) * model.at(iter);
+		counter1++;
+
+		if (counter1 == w*h) //||counter==0
+		{
+			if (tempscore > score)
+			{
+				score = tempscore;
+				letter =counter2;
+			}
+			if (verbose == 2 && counter1 > 0)
+			{
+				cout << "[Joker] "<< map[counter2] << " | " << tempscore << endl;
+			}
+			if (counter1 != 0)
+			{
+				counter2++;
+			}
+			tempscore = 0;
+			counter1 = 0;
+
+		}
+
+	}
+
+	cout << map.at(letter) << endl;
+
+	if (verbose == 1)
+	{
+		auto ocrstop = high_resolution_clock::now();
+		auto duration = duration_cast<microseconds>(ocrstop - ocrstart);
+		cout << "[Joker] Raw OCR time: "<< duration.count() << " microsecs" <<endl;
+	}
+
+	/*
 	auto ocrstart = high_resolution_clock::now();
 
 	ColorRGB pixcol;
@@ -345,6 +388,7 @@ void joker::ocrpixelavg()
 		cout <<  "Raw OCR time: "<< duration.count() << " millisecs" <<endl;
 	}
 
+	*/
 }
 
 void joker::threadtest()
@@ -402,24 +446,14 @@ void joker::threadtest()
 	if (verbose == 1)
 	{
 		auto ocrstop = high_resolution_clock::now();
-		auto duration = duration_cast<milliseconds>(ocrstop - ocrstart);
-		cout <<  "Raw threaded OCR time: "<< duration.count() << " millisecs" <<endl;
+		auto duration = duration_cast<microseconds>(ocrstop - ocrstart);
+		cout <<  "[Joker] Raw threaded OCR time: "<< duration.count() << " microsecs" <<endl;
 	}
 
 }
 
 void joker::ocrpixelavgthreaded(int start, int end, int id)
 {
-/*
-//	PixelPacket *pixels = test.getPixels(0,0,40,40);
-//	cout << (int)pixels[w*h].red << endl;
-
-//	vector<int> big_vector = {5,12,4,6,7,8,9,9,31,1,1,5,76,78,8};
-//	vector<int> subvector = {big_vector.begin() + 3, big_vector.end() - 2};
-
-//	pixcol = image.pixelColor(k,j);  //flipped j,k so model is height * width
-//	tempscore = tempscore + (((2*pixcol.red())-1) * model.at((i*w*h)+(j*w)+k));
-*/
 
 	mtx.lock();
 	PixelPacket *pixels = image.getPixels(0, 0, image.columns(), image.rows());
@@ -428,56 +462,6 @@ void joker::ocrpixelavgthreaded(int start, int end, int id)
 	mtx.lock();
 	vector<int> submodel = { (model.begin() + (start*h*w)) , (model.begin() + (end*w*h)) };
 	mtx.unlock();
-
-	/*
-	if (id == 2)
-	{
-		mtx.lock();
-
-		//image check
-		int counter = 0;
-		for (long iter = 0; iter < w*h; iter++)
-		{
-			if (counter == 40)
-			{
-				cout << "\n";
-				counter = 0;
-			}
-			cout << setw(3) << (((((int)pixels[iter].red)/255)*2)-1);
-			counter++;
-
-		}
-		cout << "\n\n\n" << endl;
-		mtx.unlock();
-	}
-
-	mtx.lock();
-
-	cout << "\n\nID: " << id << "\n\n" << endl;
-	int counter = 0;
-	long counter2 = 0;
-	for (long iter = 0; iter < w*h*(end-start); iter++)
-	{
-		if (counter == 40)
-		{
-			cout << "\n";
-			counter = 0;
-		}
-		if (counter2 == w*h)
-		{
-			cout << "\n\n" << endl;
-			counter2 = 0;
-		}
-
-		cout << setw(3) << submodel.at(iter);
-		counter++;
-		counter2++;
-	}
-
-	cout << "\n\n\n\n\n" << endl;
-
-	mtx.unlock();
-*/
 
 	long score = -100000;
 	long tempscore = 0;
@@ -497,10 +481,10 @@ void joker::ocrpixelavgthreaded(int start, int end, int id)
 				score = tempscore;
 				letter = start + counter2;
 			}
-			if (verbose == 1 && counter1 > 0)
+			if (verbose == 2 && counter1 > 0)
 			{
 				mtx.lock();
-				cout << "Thread " << id << ":: 	" << map[start+counter2] << " | " << tempscore << endl;
+				cout << "[Joker] Thread " << id << ": 	" << map[start+counter2] << " | " << tempscore << endl;
 				mtx.unlock();
 			}
 			if (counter1 != 0)
@@ -519,69 +503,6 @@ void joker::ocrpixelavgthreaded(int start, int end, int id)
 	threadoutputs[letter] = score;
 	mtx.unlock();
 
-
-/*
-
-	for (int i = 0; i < end-start; i++)
-	{
-		for (long iter = 0; iter < w*h; iter++)
-		{
-			tempscore = tempscore + (((((int)pixels[iter].red)/255)*2)-1) * submodel.at((i*w*h) + iter);
-		}
-
-		if (verbose == 1)
-		{
-			mtx.lock();
-			cout << "Thread " << id << ":: 	" << map[start+i] << " | " << tempscore << endl;
-			mtx.unlock();
-		}
-
-		if (tempscore > score)
-		{
-			score = tempscore;
-			letter = start + i;
-		}
-	}
-	mtx.lock();
-	threadoutputs[letter] = score;
-	mtx.unlock();
-*/
-
-	/*
-	ColorRGB pixcol;
-	int score = -32000;
-	int tempscore = 0;
-	int letter = 0;
-	for (int i = start; i < end; i++)
-	{
-		tempscore = 0;
-		for (unsigned int j = 0; j < h; j++)
-		{
-			for (unsigned int k = 0; k < w; k++)
-			{
-				mtx.lock();
-				pixcol = image.pixelColor(k,j);  //flipped j,k so model is height * width
-				tempscore = tempscore + (((2*pixcol.red())-1) * model.at((i*w*h)+(j*w)+k));
-				mtx.unlock();
-			}
-		}
-		if (tempscore > score)
-		{
-			score = tempscore;
-			letter  = i;
-		}
-		if (verbose == 1)
-		{
-			cout << "Thread " << id << ":: 	" << map[i] << " | " << tempscore << endl;
-		}
-	}
-	mtx.lock();
-	threadoutputs[letter] = score;
-	mtx.unlock();
-	//cout << letter << endl;
-	//cout << score << endl;
-
-	*/
 }
 
 

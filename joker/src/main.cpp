@@ -88,7 +88,7 @@ int main(int argc, const char* argv[]) {
 					}
 					if (argu1 == "-v")
 					{
-						verbose = 1;
+						verbose = stoi(argv[count1+1]);
 					}
 				}
 			}
@@ -135,7 +135,7 @@ int main(int argc, const char* argv[]) {
 		{
 			auto stop = high_resolution_clock::now();
 			auto duration = duration_cast<milliseconds>(stop - start);
-			cout << "Joker time: " << duration.count() << " millisecs" <<endl;
+			cout << "[Joker] Total time: " << duration.count() << " millisecs" <<endl;
 		}
 
 	}
@@ -188,7 +188,7 @@ void welcome()
 	cout << "[Joker] -o OCR mode		| -o" << endl;
 	cout << "[Joker] -r repeat mode		| -r         | to exit type 'exit'" << endl;
 	cout << "[Joker] -thread threading	| -thread" << endl;
-	cout << "[Joker] -v verbose	        | -v" << endl;
+	cout << "[Joker] -v verbose	level   | -v 1" << endl;
 	cout << "[Joker] -i image filepath	| -i test.jpg" << endl;
 	cout << "[Joker] -m model name		| -m mymodel" << endl;
 
