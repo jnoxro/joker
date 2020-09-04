@@ -60,7 +60,7 @@ class joker
 
 
 		// thread testing 2 - thread pool
-
+		/*
 
 		std::vector<int> workqueue;
 		std::vector<int> threadreturn;
@@ -73,6 +73,7 @@ class joker
 		void ctrlthreadpool(int op); //initiate concurrent workers - call in constructor
 		void threadworker(int id); //workers wait for work added to queue
 		void dothreadwork(); //add work to queue and get result
+		*/
 
     public:
 

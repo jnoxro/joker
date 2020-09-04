@@ -8,7 +8,7 @@
 
 
 //TODO
-// - Allow main script to call load model and init ocr separately
+//
 
 
 #include <iostream>
@@ -519,6 +519,7 @@ void joker::ocrpixelavgthreaded(int start, int end, int id)
 
 }
 
+/*
 
 void joker::ctrlthreadpool(int op)
 {
@@ -649,3 +650,4 @@ void joker::endocr()
 {
 	ctrlthreadpool(0);
 }
+*/
