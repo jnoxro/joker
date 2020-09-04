@@ -37,6 +37,13 @@ joker::joker(string modeln, int rep, int threadmode,  int verb) //initialise
 	verbose = verb;
 	repeat = rep;
 	loadmodel();
+
+
+	//threadpool:
+//	if (threading == 1)
+//	{
+//		ctrlthreadpool(1);
+//	}
 }
 
 void joker::loadmodel()
@@ -134,7 +141,7 @@ void joker::loadmodel()
 	}
 	//cout << model.size() << endl;
 
-	if (verbose == 1)
+	if (verbose == 1 || verbose == 3)
 	{
 		auto loadstop = high_resolution_clock::now();
 		auto loadduration = duration_cast<milliseconds>(loadstop - loadstart);
@@ -236,15 +243,19 @@ void joker::initocr(string imagepath)
 			{
 				if (threading == 1)
 				{
+					//og threads:
 					threadtest();
+
+					//threadpool
+					//dothreadwork();
 				}
 				else
 				{
 					ocrpixelavg();
-					//ocrpixelavgthreaded(0, 26, 99);
 				}
 			}
 		}
+
 		else if (repeat == 1)
 		{
 			while (1)
@@ -297,7 +308,7 @@ int joker::loadimage()
 		}
 	}
 
-	if (verbose == 1)
+	if (verbose == 1 || verbose == 3)
 	{
 		auto stop = high_resolution_clock::now();
 		auto duration = duration_cast<microseconds>(stop - start);
@@ -330,7 +341,7 @@ void joker::ocrpixelavg()
 				score = tempscore;
 				letter =counter2;
 			}
-			if (verbose == 2 && counter1 > 0)
+			if ((verbose == 2 || verbose == 3) && counter1 > 0)
 			{
 				cout << "[Joker] "<< map[counter2] << " | " << tempscore << endl;
 			}
@@ -347,7 +358,7 @@ void joker::ocrpixelavg()
 
 	cout << map.at(letter) << endl;
 
-	if (verbose == 1)
+	if (verbose == 1 || verbose == 3)
 	{
 		auto ocrstop = high_resolution_clock::now();
 		auto duration = duration_cast<microseconds>(ocrstop - ocrstart);
@@ -391,13 +402,16 @@ void joker::ocrpixelavg()
 	*/
 }
 
+
+//Experimental::
+
 void joker::threadtest()
 {
 	auto ocrstart = high_resolution_clock::now();
 
 	int threadnum = thread::hardware_concurrency();
 
-	if (verbose == 1)
+	if (verbose == 1 || verbose == 3)
 	{
 		cout << "[Joker] Possible concurrent threads: " << threadnum << endl;
 	}
@@ -443,7 +457,7 @@ void joker::threadtest()
 	}
 	cout << map.at(pos) << endl;
 
-	if (verbose == 1)
+	if (verbose == 1 || verbose == 3)
 	{
 		auto ocrstop = high_resolution_clock::now();
 		auto duration = duration_cast<microseconds>(ocrstop - ocrstart);
@@ -459,9 +473,9 @@ void joker::ocrpixelavgthreaded(int start, int end, int id)
 	PixelPacket *pixels = image.getPixels(0, 0, image.columns(), image.rows());
 	mtx.unlock();
 
-	mtx.lock();
+	mtx1.lock();
 	vector<int> submodel = { (model.begin() + (start*h*w)) , (model.begin() + (end*w*h)) };
-	mtx.unlock();
+	mtx1.unlock();
 
 	long score = -100000;
 	long tempscore = 0;
@@ -481,11 +495,11 @@ void joker::ocrpixelavgthreaded(int start, int end, int id)
 				score = tempscore;
 				letter = start + counter2;
 			}
-			if (verbose == 2 && counter1 > 0)
+			if ((verbose == 2 || verbose == 3) && counter1 > 0)
 			{
-				mtx.lock();
+				mtx2.lock();
 				cout << "[Joker] Thread " << id << ": 	" << map[start+counter2] << " | " << tempscore << endl;
-				mtx.unlock();
+				mtx2.unlock();
 			}
 			if (counter1 != 0)
 			{
@@ -499,11 +513,139 @@ void joker::ocrpixelavgthreaded(int start, int end, int id)
 
 	}
 
-	mtx.lock();
+	mtx3.lock();
 	threadoutputs[letter] = score;
-	mtx.unlock();
+	mtx3.unlock();
 
 }
 
 
+void joker::ctrlthreadpool(int op)
+{
+	if (op == 1) //initiate threads
+	{
+		threadctl = 1;
+		//max threads is 4 for now - set 8 vars (letter & score) so less locking required
+		const int maxthread = 4;
 
+		int threadnum = thread::hardware_concurrency();
+		if (threadnum > maxthread)
+		{
+			threadnum = maxthread;
+		}
+
+		if (verbose == 1)
+		{
+			cout << "[Joker] Possible concurrent threads: " << threadnum << endl;
+		}
+
+		vector<thread> workers;
+
+		for (int i = 0; i < threadnum; i++)
+		{
+			workers.push_back(thread(&joker::threadworker, this, i));
+			workers.at(i).detach();
+		}
+	}
+
+	if (op == 0)
+	{
+		threadctl = 0;
+	}
+}
+
+void joker::threadworker(int id)
+{
+	int mappos = 0;
+	int reuseimage = 0;
+	int job = 0;
+	int firstrun = 1;
+	PixelPacket *pixels;
+
+	while (threadctl == 1)
+	{
+		mtx1.lock();
+		if (workqueue.size() == 0) //if workqueue is empty, then OCR is finished so expect a new image
+		{
+			reuseimage = 0;
+
+		}
+		if (workqueue.size() > 0)
+		{
+			mappos = workqueue.back();
+			workqueue.pop_back();
+			reuseimage = 1;
+			job = 1;
+		}
+		mtx1.unlock();
+		mtx2.lock();
+		if ((job == 1 && reuseimage == 0) || (job == 1 && firstrun == 1))
+		{
+			pixels = image.getPixels(0, 0, image.columns(), image.rows());
+		}
+		mtx2.unlock();
+
+		if (job == 1)
+		{
+			firstrun = 0;
+			long counter1 = 0;
+			long score = 0;
+
+			for (long iter = 0; iter < w*h; iter++)
+			{
+				score = score + (((((int)pixels[counter1].red)/255)*2)-1) * model[(mappos*w*h)+iter];
+				counter1++;
+
+				if (counter1 == w*h)
+				{
+					mtx3.lock();
+					threadreturn.at(mappos) = score;
+					mtx3.unlock();
+//					if (id == 0){threadreturn0.at(mappos) = score;}
+//					if (id == 1){threadreturn1.at(mappos) = score;}
+//					if (id == 2){threadreturn2.at(mappos) = score;}
+//					if (id == 3){threadreturn3.at(mappos) = score;}
+				}
+			}
+		}
+	}
+}
+
+void joker::dothreadwork()
+{
+	auto ocrstart= high_resolution_clock::now();
+
+	for (int i = 0; i < (int)map.size(); i++)
+	{
+		workqueue.push_back(i);
+		threadreturn.push_back(0);
+	}
+
+	while (workqueue.size() != 0)
+	{
+		cout << workqueue.size() << endl;
+		continue;
+	}
+
+	for (int i = 0; i < (int)map.size(); i++)
+	{
+
+		if (verbose == 2)
+		{
+			cout << map.at(i) << " | " << threadreturn.at(i) << endl;
+		}
+	}
+
+	if (verbose == 1)
+	{
+		auto ocrstop = high_resolution_clock::now();
+		auto duration = duration_cast<microseconds>(ocrstop - ocrstart);
+		cout <<  "[Joker] Raw threadpool OCR time: "<< duration.count() << " microsecs" <<endl;
+	}
+
+}
+
+void joker::endocr()
+{
+	ctrlthreadpool(0);
+}
