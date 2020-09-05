@@ -8,6 +8,23 @@ set(CMAKE_CXX_STANDARD 17)
 file(GLOB SOURCES src/*.cpp)
 add_executable(${EXEC} ${SOURCES} /usr/local/include/GraphicsMagick/Magick++.h)
 
+if(NOT CMAKE_BUILD_TYPE)
+  set(CMAKE_BUILD_TYPE Release)
+  message(STATUS "Defaulting to Release build")
+endif()
+
+set(CMAKE_CXX_FLAGS "-Wall -Wextra")
+set(CMAKE_CXX_FLAGS_DEBUG "-g")
+set(CMAKE_CXX_FLAGS_RELEASE "-O3")
+
+#following block of code from
+#https://github.com/gnudatalanguage/gdl/blob/master/CMakeModules/FindGraphicsMagick.cmake
+#provided license
+#  This program is free software; you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation; either version 2 of the License, or
+#  (at your option) any later version.
+
 find_library(GRAPHICSMAGICK_LIBRARY NAMES GraphicsMagick)
 find_library(GRAPHICSMAGICKXX_LIBRARY NAMES GraphicsMagick++)
 set(GRAPHICSMAGICK_LIBRARIES ${GRAPHICSMAGICK_LIBRARY} ${GRAPHICSMAGICKXX_LIBRARY})
@@ -17,6 +34,9 @@ include(FindPackageHandleStandardArgs)
 find_package_handle_standard_args(GRAPHICSMAGICK DEFAULT_MSG GRAPHICSMAGICK_LIBRARIES GRAPHICSMAGICK_INCLUDE_DIR)
 
 include_directories(${GRAPHICSMAGICK_INCLUDE_DIR})
+
+#block ends
+
 
 set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${MAGICK_CPP_INFO} ${MAGICK_CXX_INFO}")
 set( CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${MAGICK_LD_INFO} ${MAGICK_LIB_INFO}")
