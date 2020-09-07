@@ -21,6 +21,7 @@ class train
     private:
 		std::string newmodel;
 		std::string datapath;
+		std::string traintype;
 
 		unsigned int h;
 		unsigned int w;
@@ -32,14 +33,16 @@ class train
 		std::vector<std::string> map;
 		std::vector<int> model;
 
-		void savemodel(std::string mode);
+		void savemodel();
 		void savemodelold(std::string mode);
+
+		//methodologies:
+		void trainpixelavg(int edgesup); //og pixel addition
 
     public:
 		train(std::string path, std::string name); //constructor
 
-		//methodologies:
-		void trainpixelavg(); //og pixel addition
+		void learn(std::string method, int egdesup);
 };
 
 

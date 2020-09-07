@@ -41,10 +41,12 @@ int main(int argc, const char* argv[]) {
 	string modelpath = "mymodel";
 	string datapath = "data";
 	string newmodel = "mymodel";
+	string method = "";
 	int repeat = 0;
 	int threadmode = 0;
 	int verbose = 0;
 	int mode = 0;
+	int e = 0;
 
 	void welcome();
 
@@ -111,6 +113,14 @@ int main(int argc, const char* argv[]) {
 					{
 						newmodel = argv[count2+1];
 					}
+					if (argu2 == "-s")
+					{
+						method = argv[count2+1];
+					}
+					if (argu2 == "-e")
+					{
+						e = stoi(argv[count2+1]);
+					}
 				}
 			}
 		}
@@ -119,7 +129,7 @@ int main(int argc, const char* argv[]) {
 	if (mode == 2)
 	{
 		train trainer(datapath, newmodel);
-		trainer.trainpixelavg();
+		trainer.learn(method, e);
 	}
 
 	if (mode == 1)
@@ -185,7 +195,7 @@ void welcome()
 
 
 	cout << "\n[Joker] OCR launch flags:\n" << endl;
-	cout << "[Joker] -o OCR mode		| -o" << endl;
+	cout << "[Joker] -o OCR     		| -o" << endl;
 	cout << "[Joker] -r repeat mode		| -r         | to exit type 'exit'" << endl;
 	cout << "[Joker] -thread threading	| -thread" << endl;
 	cout << "[Joker] -v verbose	level   | -v 1" << endl;
@@ -194,7 +204,9 @@ void welcome()
 
 
 	cout << "\n[Joker] Training launch flags:\n" << endl;
-	cout << "[Joker] -t train mode     | -t" << endl;
+	cout << "[Joker] -t train          | -t" << endl;
+	cout << "[Joker] -s methodology    | -s pixelaverage" << endl;
+	cout << "[Joker] -e edge suppress  | -e 5" << endl;
 	cout << "[Joker] -d data folder    | -d data" << endl;
 	cout << "[Joker] -n new model name | -n mymodel" << endl;
 

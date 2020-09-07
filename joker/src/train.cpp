@@ -8,7 +8,7 @@
 
 
 //TODO
-// separate save function
+// edge suppression
 
 #include <iostream>
 #include <iomanip>
@@ -38,8 +38,23 @@ train::train(std::string path, std::string name) //initialise
 	cout << "[Joker] New model name: " << newmodel << endl;
 }
 
+void train::learn(std::string method, int edgesup)
+{
+	traintype = method;
 
-void train::trainpixelavg()
+	if (traintype == "pixelaverage")
+	{
+		trainpixelavg(edgesup);
+	}
+	else
+	{
+		cerr << "[Joker] Error: Unrecognised methodology: " << traintype << endl;
+		exit(EXIT_FAILURE);
+	}
+}
+
+
+void train::trainpixelavg(int edgesup)
 {
 	cout << "\n[Joker] Pixel Average training" << endl;
 
@@ -103,7 +118,7 @@ void train::trainpixelavg()
 							{
 								model.at((lettercount*h*w)+(j*w)+k)++;
 
-								if (j < 5 || k < 5 || j > (h-5) || k > (w-5))
+								if (j < edgesup || k < edgesup || j > (h-edgesup) || k > (w-edgesup))
 								{
 									model.at((lettercount*h*w)+(j*w)+k) = model.at((lettercount*h*w)+(j*w)+k) * 0.2;
 								}
@@ -138,17 +153,17 @@ void train::trainpixelavg()
 
 	cout << "\n[Joker] Model created" << endl;
 
-	savemodel("pixelaverage");
+	savemodel();
 
 
 }
 
-void train::savemodel(string mode)
+void train::savemodel()
 {
-	if (mode == "pixelaverage")
+	if (traintype == "pixelaverage")
 	{
 		ofstream output(newmodel + ".jkr");
-		output << mode << endl;
+		output << traintype << endl;
 		output << h << endl;
 		output << w << endl;
 		output << "map::" << endl; //map marker
