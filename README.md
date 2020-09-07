@@ -18,11 +18,11 @@ Joker can be compiled from source using cmake, download the latest code from the
 
 GraphicsMagick is required for compilation, along with its dependencies.
 
-During development, GraphicsMagick 1.3.35 was used so it is recommended this version or later is installed on the compiling system. Other than GraphicsMagick only standard C++ libraries are used, as such required/depending libs can be seen with the Linux command line using:
+During development, GraphicsMagick 1.3.35 was used so it is recommended this version or later is installed on the compiling system. Other than GraphicsMagick, only standard C++ libraries are used, as such required libraries can be seen with the Linux command line using:
 
 `GraphicsMagick++-config --libs`
 
-Once the required libs are installed, navigate to the Joker directory and type the following commands for the simplest install:
+Once these libraries are installed, navigate to the Joker directory and type the following commands for the simplest install:
 
 `mkdir Build`
 
