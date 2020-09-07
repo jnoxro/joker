@@ -4,7 +4,7 @@ Joker is an OCR engine created with the focus of high speed on low performance s
 
 ## Installation
 
-Joker is uploaded to git with the necessary source files to be compiled as a standalone program with [main.cpp](https://github.com/jnoxro/joker/blob/master/joker/src/main.cpp) allowing for user control.
+Joker is uploaded to git with the necessary source files to be compiled as a standalone, command line program, or can be integrated into existing C++ projects
 
 ### Pre-compiled Binaries
 
