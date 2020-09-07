@@ -14,7 +14,7 @@ Binaries for your system may be available on the [Releases](https://github.com/j
 
 ### Compiling from source
 
-Joker can be compiled from source using cmake, download the latest code from the main [repo page](https://github.com/jnoxro/joker)
+Joker can be compiled from source using cmake, download the latest tagged release code from the main [repo page](https://github.com/jnoxro/joker)
 
 GraphicsMagick is required for compilation, along with its dependencies.
 
