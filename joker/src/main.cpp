@@ -41,12 +41,12 @@ int main(int argc, const char* argv[]) {
 	string modelpath = "mymodel";
 	string datapath = "data";
 	string newmodel = "mymodel";
-	string method = "";
+	string method = "pixelaverage";
 	int threadmode = 0;
 	int verbose = 0;
 	int mode = 0;
 	int e = 0;
-	int negscore = 0;
+	int negscore = -1;
 
 	void welcome();
 
@@ -207,6 +207,7 @@ void welcome()
 	cout << "[Joker] -t train          | -t" << endl;
 	cout << "[Joker] -s methodology    | -s pixelaverage" << endl;
 	cout << "[Joker] -e edge suppress  | -e 5" << endl;
+	cout << "[Joker] -p negative score | -p -1" << endl;
 	cout << "[Joker] -d data folder    | -d data" << endl;
 	cout << "[Joker] -n new model name | -n mymodel" << endl;
 
