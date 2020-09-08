@@ -37,7 +37,6 @@ class joker
 		unsigned int w;
 
 		void loadmodel();
-		void loadmodelold();
 		int loadimage();
 		void ocrpixelavg();
 
