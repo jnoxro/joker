@@ -19,6 +19,8 @@ class joker
 {
 
     private:
+		std::string result;
+
 		std::vector<long> model;
 		std::vector<std::string> map;
 
@@ -79,8 +81,8 @@ class joker
 
         joker(std::string modeln, int rep, int threadmode, int verb);  //constructor
 
-        void initocr(std::string imagepath);
-        void initocr(Magick::Image newimage); //overload allows image to be directly passed
+        std::string initocr(std::string imagepath);
+        std::string initocr(Magick::Image newimage); //overload allows image to be directly passed
 
         void endocr();
 

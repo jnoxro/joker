@@ -231,7 +231,7 @@ void joker::loadmodelold()
 
 }
 
-void joker::initocr(string imagepath)
+string joker::initocr(string imagepath)
 {
 	filepath = imagepath;
 
@@ -280,6 +280,8 @@ void joker::initocr(string imagepath)
 		}
 
 	}
+
+	return result;
 }
 
 int joker::loadimage()
@@ -356,7 +358,8 @@ void joker::ocrpixelavg()
 
 	}
 
-	cout << map.at(letter) << endl;
+	//cout << map.at(letter) << endl;
+	result = map.at(letter);
 
 	if (verbose == 1 || verbose == 3)
 	{
@@ -455,7 +458,8 @@ void joker::threadtest()
 			pos = ms;
 		}
 	}
-	cout << map.at(pos) << endl;
+	//cout << map.at(pos) << endl;
+	result = map.at(pos);
 
 	if (verbose == 1 || verbose == 3)
 	{
