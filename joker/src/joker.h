@@ -32,7 +32,6 @@ class joker
 		Magick::Image image;
 
 		int verbose;
-		int repeat;
 
 		unsigned int h;
 		unsigned int w;
@@ -79,7 +78,7 @@ class joker
 
     public:
 
-        joker(std::string modeln, int rep, int threadmode, int verb);  //constructor
+        joker(std::string modeln, int threadmode, int verb);  //constructor
 
         std::string initocr(std::string imagepath);
         std::string initocr(Magick::Image newimage); //overload allows image to be directly passed

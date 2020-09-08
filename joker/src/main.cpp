@@ -42,7 +42,6 @@ int main(int argc, const char* argv[]) {
 	string datapath = "data";
 	string newmodel = "mymodel";
 	string method = "";
-	int repeat = 0;
 	int threadmode = 0;
 	int verbose = 0;
 	int mode = 0;
@@ -79,10 +78,6 @@ int main(int argc, const char* argv[]) {
 					if (argu1 == "-m")
 					{
 						modelpath = argv[count1+1];
-					}
-					if (argu1 == "-r")
-					{
-						repeat = 1;
 					}
 					if (argu1 == "-thread")
 					{
@@ -138,7 +133,7 @@ int main(int argc, const char* argv[]) {
 
 		auto start = high_resolution_clock::now();
 
-		joker ocr(modelpath, repeat, threadmode, verbose);
+		joker ocr(modelpath, threadmode, verbose);
 		string letter = ocr.initocr(filepath);
 		cout << letter << endl;
 
@@ -197,7 +192,6 @@ void welcome()
 
 	cout << "\n[Joker] OCR launch flags:\n" << endl;
 	cout << "[Joker] -o OCR     		| -o" << endl;
-	cout << "[Joker] -r repeat mode		| -r         | to exit type 'exit'" << endl;
 	cout << "[Joker] -thread threading	| -thread" << endl;
 	cout << "[Joker] -v verbose	level   | -v 1" << endl;
 	cout << "[Joker] -i image filepath	| -i test.jpg" << endl;

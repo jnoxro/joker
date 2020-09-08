@@ -29,13 +29,12 @@ using namespace std;
 using namespace std::chrono;
 using namespace Magick;
 
-joker::joker(string modeln, int rep, int threadmode,  int verb) //initialise
+joker::joker(string modeln, int threadmode,  int verb) //initialise
 {
 	modelname = modeln;
 
 	threading = threadmode;
 	verbose = verb;
-	repeat = rep;
 	loadmodel();
 
 
@@ -237,50 +236,45 @@ string joker::initocr(string imagepath)
 
 	if (modeltype == "pixelaverage")
 	{
-		if (repeat == 0)
+		if (loadimage() == 1)
 		{
-			if (loadimage() == 1)
+			if (threading == 1)
 			{
-				if (threading == 1)
-				{
-					//og threads:
-					threadtest();
+				//og threads:
+				threadtest();
 
-					//threadpool
-					//dothreadwork();
-				}
-				else
-				{
-					ocrpixelavg();
-				}
+				//threadpool
+				//dothreadwork();
+			}
+			else
+			{
+				ocrpixelavg();
 			}
 		}
-
-		else if (repeat == 1)
-		{
-			while (1)
-			{
-				cin >> filepath;
-				if (filepath == "exit")
-				{
-					exit(EXIT_SUCCESS);
-				}
-				if (loadimage() == 1)
-				{
-					if (threading == 1)
-					{
-						threadtest();
-					}
-					else
-					{
-						ocrpixelavg();
-					}
-				}
-			}
-		}
-
 	}
 
+	return result;
+}
+
+string joker::initocr(Image newimage)
+{
+	image = newimage;
+
+	if (modeltype == "pixelaverage")
+	{
+		if (threading == 1)
+		{
+			//og threads:
+			threadtest();
+
+			//threadpool
+			//dothreadwork();
+		}
+		else
+		{
+			ocrpixelavg();
+		}
+	}
 	return result;
 }
 
@@ -368,41 +362,6 @@ void joker::ocrpixelavg()
 		cout << "[Joker] Raw OCR time: "<< duration.count() << " microsecs" <<endl;
 	}
 
-	/*
-	auto ocrstart = high_resolution_clock::now();
-
-	ColorRGB pixcol;
-	int score = -32000;
-	int tempscore = 0;
-	string letter;
-	for (unsigned int i = 0; i < map.size(); i++)
-	{
-		tempscore = 0;
-		for (unsigned int j = 0; j < h; j++)
-		{
-			for (unsigned int k = 0; k < w; k++)
-			{
-				pixcol = image.pixelColor(k,j);  //flipped j,k so model is height * width
-				tempscore = tempscore + (((2*pixcol.red())-1) * model.at((i*w*h)+(j*w)+k));
-			}
-		}
-		if (tempscore > score)
-		{
-			score = tempscore;
-			letter  = map[i];
-		}
-		//cout << map[i] << " | " << tempscore << endl;
-	}
-	cout << letter << endl;
-
-	if (verbose == 1)
-	{
-		auto ocrstop = high_resolution_clock::now();
-		auto duration = duration_cast<milliseconds>(ocrstop - ocrstart);
-		cout <<  "Raw OCR time: "<< duration.count() << " millisecs" <<endl;
-	}
-
-	*/
 }
 
 
