@@ -46,6 +46,7 @@ int main(int argc, const char* argv[]) {
 	int verbose = 0;
 	int mode = 0;
 	int e = 0;
+	int negscore = 0;
 
 	void welcome();
 
@@ -116,6 +117,10 @@ int main(int argc, const char* argv[]) {
 					{
 						e = stoi(argv[count2+1]);
 					}
+					if (argu2 == "-p") //p for penalty
+					{
+						negscore = stoi(argv[count2+1]);
+					}
 				}
 			}
 		}
@@ -124,7 +129,7 @@ int main(int argc, const char* argv[]) {
 	if (mode == 2)
 	{
 		train trainer(datapath, newmodel);
-		trainer.learn(method, e);
+		trainer.learn(method, e, negscore);
 	}
 
 	if (mode == 1)
