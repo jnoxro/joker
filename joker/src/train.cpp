@@ -32,15 +32,17 @@ train::train(std::string path, std::string name) //initialise
 
 	w = 0;
 	h = 0;
+	negscore = -1;
 
 	cout << "[Joker] Training mode" << endl;
 	cout << "\n[Joker] Data path: " << datapath << endl;
 	cout << "[Joker] New model name: " << newmodel << endl;
 }
 
-void train::learn(std::string method, int edgesup)
+void train::learn(std::string method, int edgesup, int neg)
 {
 	traintype = method;
+	negscore = neg;
 
 	if (traintype == "pixelaverage")
 	{
@@ -166,6 +168,7 @@ void train::savemodel()
 		output << traintype << endl;
 		output << h << endl;
 		output << w << endl;
+		output << negscore << endl;
 		output << "map::" << endl; //map marker
 		for (long unsigned int g = 1; g < map.size(); g++)
 		{

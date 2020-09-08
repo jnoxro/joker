@@ -61,6 +61,7 @@ void joker::loadmodel()
 	int readmode = 0;
 	long inint;
 	long modelcounter = 0;
+	int negscore = -1;
 	for(string line; getline( input, line ); )
 	{
 		if (readmode == 0)
@@ -83,9 +84,15 @@ void joker::loadmodel()
 		}
 		if (readmode == 3)
 		{
+			negscore = stoi(line);
+			readmode = 4;
+			continue;
+		}
+		if (readmode == 4)
+		{
 			if (line == "map::")
 			{
-				readmode = 4;
+				readmode = 5;
 				continue;
 			}
 			else
@@ -94,11 +101,11 @@ void joker::loadmodel()
 				exit(EXIT_FAILURE);
 			}
 		}
-		if (readmode == 4)
+		if (readmode == 5)
 		{
 			if (line == "model::")
 			{
-				readmode = 5;
+				readmode = 6;
 				continue;
 			}
 			else
@@ -106,7 +113,7 @@ void joker::loadmodel()
 				map.push_back(line);
 			}
 		}
-		if (readmode == 5)
+		if (readmode == 6)
 		{
 			if (map.size() == 0)
 			{
@@ -119,7 +126,7 @@ void joker::loadmodel()
 			{
 				for (int mc = modelcounter; mc < inint; mc++)
 				{
-					model.push_back(-1);
+					model.push_back(negscore);
 					modelcounter++;
 				}
 			}

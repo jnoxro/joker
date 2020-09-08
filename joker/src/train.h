@@ -25,6 +25,7 @@ class train
 
 		unsigned int h;
 		unsigned int w;
+		int negscore;
 
 		imggrab fetcher;
 
@@ -42,7 +43,7 @@ class train
     public:
 		train(std::string path, std::string name); //constructor
 
-		void learn(std::string method, int egdesup);
+		void learn(std::string method, int egdesup, int neg);
 };
 
 
