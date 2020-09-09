@@ -151,7 +151,10 @@ int main(int argc, const char* argv[]) {
 			cout << "[Joker] Total time: " << duration.count() << " millisecs" <<endl;
 		}
 
-		ocr.endocr(); //terminate threadpool
+		if (threadmode == 1)
+		{
+			ocr.endocr(); //terminate threadpool
+		}
 
 	}
 

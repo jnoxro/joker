@@ -60,6 +60,9 @@ class joker
 		void threadtest();
 		void ocrpixelavgthreaded(int start, int end, int id, Magick::PixelPacket *pixels);
 
+
+
+
 		//*********//
 		//threadpooling should use resources better
 
@@ -78,6 +81,8 @@ class joker
 		int terminator; //set to 1 to end worker loops
 		std::atomic<int> newwork{0};
 		std::atomic<int> fin{0};
+
+		Magick::PixelPacket *poolpixels;
 
 		void initthreadpool();
 		void worker(int id);

@@ -43,7 +43,10 @@ joker::joker(string modeln, int threadmode,  int verb) //initialise
 	terminator = 0; //set to 1 to end worker loops
 	loadmodel();
 
-	initthreadpool();
+	if (threading == 1)
+	{
+		initthreadpool();
+	}
 }
 
 void joker::loadmodel()
@@ -481,7 +484,7 @@ void joker::worker(int id)
 	int mapj = 0;
 	int newj = 0;
 	int newimg = 1;
-	PixelPacket *pixels;
+	//PixelPacket *pixels;
 
 	long score = -100000;
 	long tempscore = 0;
@@ -492,13 +495,14 @@ void joker::worker(int id)
 	{
 		if (newwork.load() == 1) //maybe mutex around if declare
 		{
-			poolmtx0.lock();
-			if (newimg == 1)
-			{
-				pixels = image.getPixels(0, 0, image.columns(), image.rows()); //could be moved to initocr so only done once
-				newimg = 0;
-			}
-			poolmtx0.unlock();
+//			poolmtx0.lock();
+//			if (newimg == 1)
+//			{
+//				cout << "loading image" << endl;
+//				pixels = image.getPixels(0, 0, image.columns(), image.rows()); //could be moved to initocr so only done once
+//				newimg = 0;
+//			}
+//			poolmtx0.unlock();
 
 			poolmtx1.lock();
 			if (queue > 0)
@@ -518,7 +522,7 @@ void joker::worker(int id)
 				for (long iter = 0; iter < w*h*(1); iter++) //*1 for now as one job is one comparison
 				{
 					//tempscore = tempscore + (((((int)pixels[counter1].red)/255)*2)-1) * submodel.at(iter);
-					tempscore = tempscore + (((((int)pixels[counter1].red)/255)*2)-1) * model[iter + (w*h*mapj)];
+					tempscore = tempscore + (((((int)poolpixels[counter1].red)/255)*2)-1) * model[iter + (w*h*mapj)];
 					counter1++;
 
 					if (counter1 == w*h) //||counter==0
@@ -553,10 +557,10 @@ void joker::worker(int id)
 				++fin;
 			}
 		}
-		if (newwork.load() == 0)
-		{
-			newimg = 1;
-		}
+//		if (newwork.load() == 0)
+//		{
+//			newimg = 1;
+//		}
 	}
 
 	if (verbose == 1 || verbose == 3)
@@ -571,11 +575,11 @@ void joker::job()
 {
 	auto startt = high_resolution_clock::now();
 
+	poolpixels = image.getPixels(0, 0, image.columns(), image.rows());
+
 	queue = map.size();
 	++newwork;
-
-
-	while (fin.load() < map.size())
+	while (fin.load() < (int)map.size())
 	{
 		continue;
 	}
