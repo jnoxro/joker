@@ -358,6 +358,8 @@ void joker::threadtest()
 void joker::ocrpixelavgthreaded(int start, int end, int id)
 {
 
+	auto startt = high_resolution_clock::now();
+
 	mtx.lock();
 	PixelPacket *pixels = image.getPixels(0, 0, image.columns(), image.rows());
 	mtx.unlock();
@@ -365,6 +367,13 @@ void joker::ocrpixelavgthreaded(int start, int end, int id)
 	mtx1.lock();
 	vector<int> submodel = { (model.begin() + (start*h*w)) , (model.begin() + (end*w*h)) };
 	mtx1.unlock();
+
+	if (verbose == 1 || verbose == 3)
+	{
+		auto stopt = high_resolution_clock::now();
+		auto duration = duration_cast<microseconds>(stopt - startt);
+		cout <<  "[Joker] Thread " << id << " blocked time: "<< duration.count() << " microsecs" <<endl;
+	}
 
 	long score = -100000;
 	long tempscore = 0;
@@ -406,6 +415,12 @@ void joker::ocrpixelavgthreaded(int start, int end, int id)
 	threadoutputs[letter] = score;
 	mtx3.unlock();
 
+	if (verbose == 1 || verbose == 3)
+	{
+		auto stopt = high_resolution_clock::now();
+		auto duration = duration_cast<microseconds>(stopt - startt);
+		cout <<  "[Joker] Thread " << id << " time: "<< duration.count() << " microsecs" <<endl;
+	}
 }
 
 /*
