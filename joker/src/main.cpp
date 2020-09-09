@@ -144,7 +144,7 @@ int main(int argc, const char* argv[]) {
 
 
 
-		if (verbose == 1)
+		if (verbose == 1 || verbose == 3)
 		{
 			auto stop = high_resolution_clock::now();
 			auto duration = duration_cast<milliseconds>(stop - start);
