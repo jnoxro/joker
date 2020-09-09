@@ -14,12 +14,14 @@
 #include <vector>
 #include <thread>
 #include <mutex>
+#include <atomic>
 
 class joker
 {
 
     private:
 		std::string result;
+		long globalscore;
 
 		std::vector<long> model;
 		std::vector<std::string> map;
@@ -56,24 +58,30 @@ class joker
 		std::vector<int> threadoutputs;
 
 		void threadtest();
-		void ocrpixelavgthreaded(int start, int end, int id);
+		void ocrpixelavgthreaded(int start, int end, int id, Magick::PixelPacket *pixels);
 
+		//*********//
+		//threadpooling should use resources better
 
-		// thread testing 2 - thread pool
-		/*
+		std::vector<std::thread> workers;
 
-		std::vector<int> workqueue;
-		std::vector<int> threadreturn;
-//		std::vector<int> threadreturn0;
-//		std::vector<int> threadreturn1;
-//		std::vector<int> threadreturn2;
-//		std::vector<int> threadreturn3;
-		int threadctl;
+		std::mutex poolmtx;
+		std::mutex poolmtx0;
+		std::mutex poolmtx1;
+		std::mutex poolmtx2;
+		std::mutex poolmtx3;
+		std::mutex poolmtx4;
 
-		void ctrlthreadpool(int op); //initiate concurrent workers - call in constructor
-		void threadworker(int id); //workers wait for work added to queue
-		void dothreadwork(); //add work to queue and get result
-		*/
+		int threadcount;
+		//int newwork; //signifies new work available
+		int queue; //queue would just hold numbers of map positions, instead threads can just reduce int by 1 to take a job.
+		int terminator; //set to 1 to end worker loops
+		std::atomic<int> newwork{0};
+		std::atomic<int> fin{0};
+
+		void initthreadpool();
+		void worker(int id);
+		void job();
 
     public:
 

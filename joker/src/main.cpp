@@ -142,6 +142,8 @@ int main(int argc, const char* argv[]) {
 		string letter = ocr.initocr(filepath);
 		cout << letter << endl;
 
+
+
 		if (verbose == 1)
 		{
 			auto stop = high_resolution_clock::now();
@@ -149,34 +151,12 @@ int main(int argc, const char* argv[]) {
 			cout << "[Joker] Total time: " << duration.count() << " millisecs" <<endl;
 		}
 
+		ocr.endocr(); //terminate threadpool
+
 	}
 
 
 
-/*
-	Image test;
-	imggrab grabby;
-	grabby.grab("trainingData5/A/0.jpg");
-	test = grabby.give();
-	test.threshold(125);
-	//Pixels view(test);
-
-	auto cachestart = high_resolution_clock::now();
-	PixelPacket *pixels = test.getPixels(0,0,40,40);
-	cout << (int)pixels[34].red << endl;
-	auto cachestop = high_resolution_clock::now();
-	auto cacheduration = duration_cast<microseconds>(cachestop - cachestart);
-	cout <<  "cache time: "<< cacheduration.count() << " microsecs" <<endl;
-
-	auto ogstart = high_resolution_clock::now();
-	ColorRGB pixcol;
-	pixcol = test.pixelColor(34,0);
-	cout << pixcol.red() << endl;
-	auto ogstop = high_resolution_clock::now();
-	auto ogduration = duration_cast<microseconds>(ogstop - ogstart);
-	cout <<  "og time: "<< ogduration.count() << " microsecs" <<endl;
-
-*/
 
 	return 0;
 }
