@@ -197,6 +197,7 @@ void train::savemodel()
 
 		cout << "[Joker] Model saved" << endl;
 	}
+
 }
 
 void train::savemodelold(string mode)
