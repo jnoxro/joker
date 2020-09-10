@@ -254,17 +254,20 @@ void joker::ocrpixelavg()
 
 	long counter1 = 0; //to image pixel count
 	long counter2 = 0; //map pos counter
-	for (long iter = 0; iter < w*h*((int)map.size()); iter++)
+
+	long iterend = w*h*((int)map.size()); //moved out of loop for les calcs
+	long imagelength = w*h;
+	for (long iter = 0; iter < iterend; iter++)
 	{
-		tempscore = tempscore + (((((int)pixels[counter1].red)/255)*2)-1) * model.at(iter);
+		tempscore = tempscore + (((((int)pixels[counter1].red)/255)*2)-1) * model[iter];
 		counter1++;
 
-		if (counter1 == w*h) //||counter==0
+		if (counter1 == imagelength) //||counter==0
 		{
 			if (tempscore > score)
 			{
 				score = tempscore;
-				letter =counter2;
+				letter = counter2;
 			}
 			if ((verbose == 2 || verbose == 3) && counter1 > 0)
 			{
@@ -282,7 +285,7 @@ void joker::ocrpixelavg()
 	}
 
 	//cout << map.at(letter) << endl;
-	result = map.at(letter);
+	result = map[letter];
 
 	if (verbose == 1 || verbose == 3)
 	{
@@ -481,65 +484,73 @@ void joker::worker(int id)
 		poolmtx.unlock();
 	}
 
-	int mapj = 0;
-	int newj = 0;
-	int newimg = 1;
+	int mapj = 0; //work map position
+	int newj = 0; //work left
+	int worksize = 0; //size of work (how much of map being covered)
+	//int newimg = 1; //new image required (new job)
 	//PixelPacket *pixels;
 
 	long score = -100000;
 	long tempscore = 0;
 	long counter1 = 0;
-	int letter;
+	long counter2 = 0;
+	int letter = 0;
 
 	while (terminator == 0)
 	{
 		if (newwork.load() == 1) //maybe mutex around if declare
 		{
-//			poolmtx0.lock();
-//			if (newimg == 1)
-//			{
-//				cout << "loading image" << endl;
-//				pixels = image.getPixels(0, 0, image.columns(), image.rows()); //could be moved to initocr so only done once
-//				newimg = 0;
-//			}
-//			poolmtx0.unlock();
 
 			poolmtx1.lock();
 			if (queue > 0)
 			{
-				queue--;
-				mapj = queue; //after queue-- as would have been mapj = queue-1 anyways (queue = mapsize, not indexes)
-				newj = 1; //signify queue was bigger than 0
+				if (queue > 1)
+				{
+					queue -= 2;
+					mapj = queue; //after queue-- as would have been mapj = queue-1 anyways (queue = mapsize, not indexes)
+					newj = 2; //work left
+					worksize = 2;
+				}
+				else
+				{
+					queue -= 1;
+					mapj = queue; //after queue-- as would have been mapj = queue-1 anyways (queue = mapsize, not indexes)
+					newj = 1; //work left
+					worksize = 1;
+				}
 				if (queue == 0)
 				{
-					--newwork;
+					newwork = 0;
 				}
 			}
 			poolmtx1.unlock();
 
-			if (newj == 1)
+			long modelstart = w*h*(mapj); //moved out loop to reduce calcs
+			long iterend = w*h*(worksize); //moved out of loop to reduce calcs
+			long imagelength = w*h; //moved out of loop to reduce calcs
+			if (newj > 0)
 			{
-				for (long iter = 0; iter < w*h*(1); iter++) //*1 for now as one job is one comparison
+				for (long iter = 0; iter < iterend; iter++) //*1 for now as one job is one comparison
 				{
-					//tempscore = tempscore + (((((int)pixels[counter1].red)/255)*2)-1) * submodel.at(iter);
-					tempscore = tempscore + (((((int)poolpixels[counter1].red)/255)*2)-1) * model[iter + (w*h*mapj)];
+					tempscore = tempscore + (((((int)poolpixels[counter1].red)/255)*2)-1) * model[(modelstart) + iter];
 					counter1++;
 
-					if (counter1 == w*h) //||counter==0
+					if (counter1 == imagelength) //||counter==0
 					{
 						if (tempscore > score)
 						{
 							score = tempscore;
-							letter = mapj;
+							letter = mapj + counter2;
 						}
 						if ((verbose == 2 || verbose == 3) && counter1 > 0)
 						{
 							poolmtx3.lock();
-							cout << "[Joker] Thread " << id << ": 	" << map[mapj] << " | " << tempscore << endl;
+							cout << "[Joker] Thread " << id << ": 	" << map[mapj + counter2] << " | " << tempscore << endl;
 							poolmtx3.unlock();
 						}
 						tempscore = 0;
 						counter1 = 0;
+						counter2 += 1;
 
 					}
 				}
@@ -553,8 +564,10 @@ void joker::worker(int id)
 				}
 				poolmtx4.unlock();
 
+				//reset ready for next use
+				counter2 = 0;
 				score = -100000;
-				++fin;
+				fin += worksize;
 			}
 		}
 //		if (newwork.load() == 0)
@@ -578,12 +591,13 @@ void joker::job()
 	poolpixels = image.getPixels(0, 0, image.columns(), image.rows());
 
 	queue = map.size();
-	++newwork;
+	newwork = 1;
 	while (fin.load() < (int)map.size())
 	{
 		continue;
 	}
 
+	globalscore = -100000; //reset to avoid no result when all negs=ative scores
 	if (verbose == 1 || verbose == 3)
 	{
 		auto stopt = high_resolution_clock::now();

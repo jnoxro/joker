@@ -21,7 +21,7 @@ class joker
 
     private:
 		std::string result;
-		long globalscore;
+		long globalscore = -100000;
 
 		std::vector<long> model;
 		std::vector<std::string> map;

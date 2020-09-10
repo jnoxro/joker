@@ -139,8 +139,10 @@ int main(int argc, const char* argv[]) {
 		auto start = high_resolution_clock::now();
 
 		joker ocr(modelpath, threadmode, verbose);
+
 		string letter = ocr.initocr(filepath);
 		cout << letter << endl;
+
 
 
 
