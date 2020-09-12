@@ -76,7 +76,7 @@ ExternalProject_Add(GraphicsMagick_project
 	 URL ftp://ftp.graphicsmagick.org/pub/GraphicsMagick/GraphicsMagick-LATEST.tar.gz
 	 DOWNLOAD_DIR ${CMAKE_CURRENT_BINARY_DIR}/GM/SRC_DIR
 	 
-	 CONFIGURE_COMMAND configure --with-quantum-depth=8 --without-bzlib --without-dps --without-jbig --without-webp --without-jp2 --without-lcms2 --without-lzma --without-tiff --without-trio --without-ttf --without-wmf --without-xml --without-zlib --without-zstd --with-x=no --with-zlib=no --without-png
+	 CONFIGURE_COMMAND ${GM_CONFIG} ${GM_CONFIG_ARGS}
 	 
 	 BUILD_COMMAND make
 	 
