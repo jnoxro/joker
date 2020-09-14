@@ -51,24 +51,32 @@ endif()
 #install graphicsmagcik with correct options
 include(ExternalProject)
 
-set(GM_CONFIG "${CMAKE_CURRENT_BINARY_DIR}/GM/SRC_DIR/")
+set(GM_CONFIG "${CMAKE_CURRENT_BINARY_DIR}/GM/SRC_DIR/./configure")
+set(GM_CONFIG_ARGS "--with-quantum-depth=8 --without-dps --without-bzlib --without-jbig --without-webp --without-jp2 --without-lcms2 --without-lzma --without-tiff --without-trio --without-ttf --without-wmf --without-xml --without-zlib --without-zstd --with-x=no --with-zlib=no --without-png")
+separate_arguments(GM_CONFIG_ARGS)
+list(APPEND GM_CONFIG ${GM_CONFIG_ARGS})
+message(STATUS "CONFIG_COMAND: ${GM_CONFIG}")
 
-set(GM_CONFIG_ARGS "--with-quantum-depth=8 --without-bzlib --without-dps --without-jbig --without-webp --without-jp2 --without-lcms2 --without-lzma --without-tiff --without-trio --without-ttf --without-wmf --without-xml --without-zlib --without-zstd --with-x=no --with-zlib=no --without-png")
+set(GM_MAKE "make")
+set(GM_MAKE_ARGS "-C ${CMAKE_CURRENT_BINARY_DIR}/GM/SRC_DIR")
+list(APPEND GM_MAKE ${GM_MAKE_ARGS})
+message(STATUS "MAKE_COMAND: ${GM_MAKE}")
 
 if(${GM_PROVIDED})
 ExternalProject_Add(GraphicsMagick_project
-	 PREFIX ${CMAKE_CURRENT_BINARY_DIR}/GM
+	PREFIX ${CMAKE_CURRENT_BINARY_DIR}/GM
 	 
-	 URL ${GM_SOURCE}
-	 SOURCE_DIR ${CMAKE_CURRENT_BINARY_DIR}/GM/SRC_DIR
+	URL ${GM_SOURCE}
+	SOURCE_DIR ${CMAKE_CURRENT_BINARY_DIR}/GM/SRC_DIR
 	 
 
-	 CONFIGURE_COMMAND ${GM_CONFIG}./configure ${GM_CONFIG_ARGS}
+#	 CONFIGURE_COMMAND ${GM_CONFIG}./configure ${GM_CONFIG_ARGS}
+	CONFIGURE_COMMAND ${GM_CONFIG}
 	 
-	 BUILD_IN_SOURCE 1
-	 BUILD_COMMAND /GM/SRC_DIR/make
+	BUILD_IN_SOURCE 1
+	BUILD_COMMAND ${GM_MAKE}
 	 
-	 INSTALL_COMMAND /GM/SRC_DIR/make DESTDIR=${CMAKE_CURRENT_BINARY_DIR}/GM/install install
+	INSTALL_COMMAND /GM/SRC_DIR/make DESTDIR=${CMAKE_CURRENT_BINARY_DIR}/GM/install install
 )
 
 
@@ -79,7 +87,7 @@ ExternalProject_Add(GraphicsMagick_project
 	 URL ftp://ftp.graphicsmagick.org/pub/GraphicsMagick/GraphicsMagick-LATEST.tar.gz
 	 DOWNLOAD_DIR ${CMAKE_CURRENT_BINARY_DIR}/GM/SRC_DIR
 	 
-	 CONFIGURE_COMMAND ${GM_CONFIG}./configure ${GM_CONFIG_ARGS}
+#	 CONFIGURE_COMMAND ${GM_CONFIG}./configure ${GM_CONFIG_ARGS}
 	 
 	 BUILD_IN_SOURCE 1
 	 BUILD_COMMAND /GM/SRC_DIR/make
