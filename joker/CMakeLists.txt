@@ -26,7 +26,7 @@ if(NOT (GM_SOURCE OR GM_SOURCE_ABS))
 	set(GM_SOURCE "${GM_DEFAULT_SOURCE}")
 else()
 	if (GM_SOURCE)
-		get_filename_component(GM_SOURCE ${GM_SOURCE} ABSOLUTE)
+		get_filename_component(GM_SOURCE ${GM_SOURCE} ABSOLUTE) #maybe broken
 	endif()
 	if (GM_SOURCE_ABS)
 		set(GM_SOURCE "${GM_SOURCE_ABS}")
@@ -51,7 +51,8 @@ endif()
 #install graphicsmagcik with correct options
 include(ExternalProject)
 
-set(GM_CONFIG "./configure")
+set(GM_CONFIG "${CMAKE_CURRENT_BINARY_DIR}/GM/SRC_DIR/")
+
 set(GM_CONFIG_ARGS "--with-quantum-depth=8 --without-bzlib --without-dps --without-jbig --without-webp --without-jp2 --without-lcms2 --without-lzma --without-tiff --without-trio --without-ttf --without-wmf --without-xml --without-zlib --without-zstd --with-x=no --with-zlib=no --without-png")
 
 if(${GM_PROVIDED})
@@ -60,12 +61,14 @@ ExternalProject_Add(GraphicsMagick_project
 	 
 	 URL ${GM_SOURCE}
 	 SOURCE_DIR ${CMAKE_CURRENT_BINARY_DIR}/GM/SRC_DIR
+	 
 
-	 CONFIGURE_COMMAND ${GM_CONFIG} ${GM_CONFIG_ARGS}
+	 CONFIGURE_COMMAND ${GM_CONFIG}./configure ${GM_CONFIG_ARGS}
 	 
-	 BUILD_COMMAND ${CMAKE_CURRENT_BINARY_DIR}/GM/SRC_DIR/make
+	 BUILD_IN_SOURCE 1
+	 BUILD_COMMAND /GM/SRC_DIR/make
 	 
-	 INSTALL_COMMAND ${CMAKE_CURRENT_BINARY_DIR}/GM/SRC_DIR/make DESTDIR=${CMAKE_CURRENT_BINARY_DIR}/GM/install install
+	 INSTALL_COMMAND /GM/SRC_DIR/make DESTDIR=${CMAKE_CURRENT_BINARY_DIR}/GM/install install
 )
 
 
@@ -76,11 +79,12 @@ ExternalProject_Add(GraphicsMagick_project
 	 URL ftp://ftp.graphicsmagick.org/pub/GraphicsMagick/GraphicsMagick-LATEST.tar.gz
 	 DOWNLOAD_DIR ${CMAKE_CURRENT_BINARY_DIR}/GM/SRC_DIR
 	 
-	 CONFIGURE_COMMAND ${GM_CONFIG} ${GM_CONFIG_ARGS}
+	 CONFIGURE_COMMAND ${GM_CONFIG}./configure ${GM_CONFIG_ARGS}
 	 
-	 BUILD_COMMAND make
+	 BUILD_IN_SOURCE 1
+	 BUILD_COMMAND /GM/SRC_DIR/make
 	 
-	 INSTALL_COMMAND make DESTDIR=${CMAKE_CURRENT_BINARY_DIR}/GM/install install
+	 INSTALL_COMMAND /GM/SRC_DIR/make DESTDIR=${CMAKE_CURRENT_BINARY_DIR}/GM/install install
 )
 endif()
 
