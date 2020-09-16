@@ -21,15 +21,12 @@ endif()
 
 
 #Set graphicsmagick source path
-if(NOT (GM_SOURCE OR GM_SOURCE_ABS))
+if(NOT GM_SOURCE)
 	message(STATUS "Default GraphicsMagick source location: ${GM_DEFAULT_SOURCE}")
 	set(GM_SOURCE "${GM_DEFAULT_SOURCE}")
 else()
 	if (GM_SOURCE)
 		get_filename_component(GM_SOURCE ${GM_SOURCE} ABSOLUTE) #maybe broken
-	endif()
-	if (GM_SOURCE_ABS)
-		set(GM_SOURCE "${GM_SOURCE_ABS}")
 	endif()
 endif()
 
@@ -76,68 +73,66 @@ ExternalProject_Add(GraphicsMagick_project
 	URL ${GM_SOURCE}
 	SOURCE_DIR ${CMAKE_CURRENT_BINARY_DIR}/GM/SRC_DIR
 	 
-
-#	 CONFIGURE_COMMAND ${GM_CONFIG}./configure ${GM_CONFIG_ARGS}
 	CONFIGURE_COMMAND ${GM_CONFIG}
 	 
 	BUILD_IN_SOURCE 1
 	BUILD_COMMAND ${GM_MAKE}
 	 
+	INSTALL_DIR ${CMAKE_CURRENT_BINARY_DIR}/GM/install
 	INSTALL_COMMAND ${GM_INSTALL}
 )
 
 
 else()
 ExternalProject_Add(GraphicsMagick_project
-	 PREFIX ${CMAKE_CURRENT_BINARY_DIR}/GM
+	PREFIX ${CMAKE_CURRENT_BINARY_DIR}/GM
 	 
-	 URL ftp://ftp.graphicsmagick.org/pub/GraphicsMagick/GraphicsMagick-LATEST.tar.gz
-	 DOWNLOAD_DIR ${CMAKE_CURRENT_BINARY_DIR}/GM/SRC_DIR
+	URL ftp://ftp.graphicsmagick.org/pub/GraphicsMagick/GraphicsMagick-LATEST.tar.gz
+	DOWNLOAD_DIR ${CMAKE_CURRENT_BINARY_DIR}/GM/SRC_DIR
 	 
-#	 CONFIGURE_COMMAND ${GM_CONFIG}./configure ${GM_CONFIG_ARGS}
 	CONFIGURE_COMMAND ${GM_CONFIG}
 	 
 	BUILD_IN_SOURCE 1
 	BUILD_COMMAND ${GM_MAKE}
 	 
+	INSTALL_DIR ${CMAKE_CURRENT_BINARY_DIR}/GM/install
 	INSTALL_COMMAND ${GM_INSTALL}
 )
 endif()
 
-add_library(GRAPHICSMAGICK_LIBRARY STATIC IMPORTED)
-add_library(GRAPHICSMAGICKXX_LIBRARY STATIC IMPORTED)
+ExternalProject_Get_Property(GraphicsMagick_project install_dir)
 
-set_property(TARGET GRAPHICSMAGICK_LIBRARY PROPERTY IMPORTED_LOCATION ${CMAKE_CURRENT_BINARY_DIR}/GM/install/usr/local/lib/libGraphicsMagick.a)
+SET(GM_INCLUDE_DIR ${install_dir}/usr/local/include/GraphicsMagick)
+get_filename_component(GM_INCLUDE_DIR ${GM_INCLUDE_DIR} ABSOLUTE)
+include_directories(${GM_INCLUDE_DIR} ${GM_INCLUDE_DIR}/)
 
-set_property(TARGET GRAPHICSMAGICKXX_LIBRARY PROPERTY IMPORTED_LOCATION ${CMAKE_CURRENT_BINARY_DIR}/GM/install/usr/local/lib/libGraphicsMagick++.a)
-
-add_dependencies(GRAPHICSMAGICK_LIBRARY GraphicsMagick_project)
-add_dependencies(GRAPHICSMAGICKXX_LIBRARY GraphicsMagick_project)
+SET(GM_LIB_DIR ${install_dir}/usr/local/lib)
+get_filename_component(GM_LIB_DIR ${GM_LIB_DIR} ABSOLUTE)
 
 
-set(GRAPHICSMAGICK_LIBRARIES ${GRAPHICSMAGICK_LIBRARY} ${GRAPHICSMAGICKXX_LIBRARY})
-message(STATUS "libs: ${GRAPHICSMAGICK_LIBRARIES}")
-
-#find_path(GRAPHICSMAGICK_INCLUDE_DIR NAMES magick/api.h PATH_SUFFIXES GraphicsMagick)
-set(LIBRARIES ${LIBRARIES} ${GRAPHICSMAGICK_LIBRARIES})
-set(GRAPHICSMAGICK_INCLUDE_DIR ${CMAKE_CURRENT_BINARY_DIR}/GM/install/usr/local/include/GrahpicsMagick)
-
-#include(FindPackageHandleStandardArgs)
-#find_package_handle_standard_args(GRAPHICSMAGICK DEFAULT_MSG GRAPHICSMAGICK_LIBRARIES GRAPHICSMAGICK_INCLUDE_DIR)
-
-include_directories(src ${GRAPHICSMAGICK_INCLUDE_DIR})
-message(STATUS "include dirs: ${GRAPHICSMAGICK_INCLUDE_DIR}")
+link_directories(${GM_LIB_DIR} ${GM_LIB_DIR}/)
 
 
 
-set(EXEC joker)
+add_library(GRAPHICSMAGICK_LIB STATIC IMPORTED)
+set_target_properties(GRAPHICSMAGICK_LIB PROPERTIES IMPORTED_LOCATION ${GM_LIB_DIR}/libGraphicsMagick.a)
+
+add_library(GRAPHICSMAGICKXX_LIB STATIC IMPORTED)
+set_target_properties(GRAPHICSMAGICKXX_LIB PROPERTIES IMPORTED_LOCATION ${GM_LIB_DIR}/libGraphicsMagick++.a)
+
+set(LIBRARIES ${GRAPHICSMAGICK_LIB} ${GRAPHICSMAGICKXX_LIB})
+
 
 #set sources
 file(GLOB SOURCES src/*.cpp) #GLOB not recomended -> add sources individually
-add_executable(${EXEC} ${SOURCES})
-add_dependencies(joker GraphicsMagick_project)
+add_executable(joker ${SOURCES})
 
-target_link_libraries(joker ${LIBRARIES} GraphicsMagick GraphicsMagick++ jbig tiff freetype jpeg png16 Xext SM ICE X11 lzma z m pthread gomp)
+
+add_dependencies(joker GraphicsMagick_project) #builds graphicsmagick
+include_directories(src)
+
+target_link_libraries(joker GRAPHICSMAGICK_LIB GRAPHICSMAGICKXX_LIB GraphicsMagick GraphicsMagick++ jpeg m pthread gomp)
+#target_link_libraries(joker ${LIBRARIES} GraphicsMagick GraphicsMagick++ jbig tiff freetype jpeg png16 Xext SM ICE X11 lzma z m pthread gomp)
 
 
 
