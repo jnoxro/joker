@@ -86,9 +86,10 @@ ExternalProject_Add(GraphicsMagick_project
 else()
 ExternalProject_Add(GraphicsMagick_project
 	PREFIX ${CMAKE_CURRENT_BINARY_DIR}/GM
-	 
+	SOURCE_DIR ${CMAKE_CURRENT_BINARY_DIR}/GM/SRC_DIR
+	
 	URL ftp://ftp.graphicsmagick.org/pub/GraphicsMagick/GraphicsMagick-LATEST.tar.gz
-	DOWNLOAD_DIR ${CMAKE_CURRENT_BINARY_DIR}/GM/SRC_DIR
+	DOWNLOAD_DIR ${CMAKE_CURRENT_SOURCE_DIR}
 	 
 	CONFIGURE_COMMAND ${GM_CONFIG}
 	 
