@@ -25,6 +25,11 @@ From with the joker project file, run the following commands in terminal:
 `cd Build`
 
 `cmake ..`
+optional cmake -D flags:
+- GM_VERSION=x.x.x specify a specific version on GraphicsMagick to be downlaoded (default is 1.3.35)
+- GM_SOURCE=x provide an alternative (relative) filepath to a GraphicsMagick archive which you have downlaoded elsewhere (default is /External/downlaod)
+
+eg: `cmake -DGM_VERSION=1.3.34 ..`
 
 `make`
 
