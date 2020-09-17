@@ -48,6 +48,17 @@ set(GM_DEFAULT_INSTALL "${CMAKE_CURRENT_SOURCE_DIR}/External/install/GM/usr/loca
 ################################################
 #Check if necessary external files are user provided or if make previously GM donloaded & installed
 
+if(NOT GM_VERSION)
+	set(GM_VERSION "1.3.35")
+	message(STATUS "GM version not given, defaulting to ${GM_VERSION}")
+else()
+	message(STATUS "Checking for GM ${GM_VERSION}")
+endif()
+
+#Check locations for GM previous download/install
+set(GM_DEFAULT_SOURCE "${CMAKE_CURRENT_SOURCE_DIR}/External/download/GraphicsMagick-${GM_VERSION}.tar.gz") #change to .tar.gz or other archive
+set(GM_DEFAULT_INSTALL "${CMAKE_CURRENT_SOURCE_DIR}/External/install/GM/usr/local/include/GraphicsMagick/Magick++.h")
+
 
 #Set graphicsmagick source path
 if(NOT GM_SOURCE)
@@ -150,7 +161,7 @@ ExternalProject_Add(GraphicsMagick_project
 	
 	#URL ftp://ftp.graphicsmagick.org/pub/GraphicsMagick/GraphicsMagick-LATEST.tar.gz
 	#DOWNLOAD_DIR ${CMAKE_CURRENT_SOURCE_DIR}
-	URL https://sourceforge.net/projects/graphicsmagick/files/graphicsmagick/1.3.35/GraphicsMagick-1.3.35.tar.gz
+	URL https://sourceforge.net/projects/graphicsmagick/files/graphicsmagick/${GM_VERSION}/GraphicsMagick-${GM_VERSION}.tar.gz
 	DOWNLOAD_DIR ${CMAKE_CURRENT_SOURCE_DIR}/External/download
 	 
 	CONFIGURE_COMMAND ${GM_CONFIG}
@@ -162,10 +173,14 @@ ExternalProject_Add(GraphicsMagick_project
 	INSTALL_DIR ${CMAKE_CURRENT_SOURCE_DIR}/External/install/GM
 	INSTALL_COMMAND ${GM_INSTALL}
 )
+
+ExternalProject_Get_Property(GraphicsMagick_project install_dir)
+
 endif()
 ##############################################
 else()
-message(STATUS "GM install skipped")
+message(STATUS "GM already installed")
+SET(install_dir ${CMAKE_CURRENT_SOURCE_DIR}/External/install/GM)
 endif()
 ##############################################
 
@@ -177,15 +192,15 @@ endif()
 ##############################################
 #Add GM libraries to be linked
 
-ExternalProject_Get_Property(GraphicsMagick_project install_dir)
+#ExternalProject_Get_Property(GraphicsMagick_project install_dir)
 
 #Set include locations (.h files)
-SET(GM_INCLUDE_DIR ${install_dir}/usr/local/include/GraphicsMagick)
+set(GM_INCLUDE_DIR ${install_dir}/usr/local/include/GraphicsMagick)
 get_filename_component(GM_INCLUDE_DIR ${GM_INCLUDE_DIR} ABSOLUTE)
 include_directories(${GM_INCLUDE_DIR} ${GM_INCLUDE_DIR}/)
 
 #Set lib locations (.a files)
-SET(GM_LIB_DIR ${install_dir}/usr/local/lib)
+set(GM_LIB_DIR ${install_dir}/usr/local/lib)
 get_filename_component(GM_LIB_DIR ${GM_LIB_DIR} ABSOLUTE)
 link_directories(${GM_LIB_DIR} ${GM_LIB_DIR}/)
 
@@ -206,8 +221,6 @@ set(LIBRARIES ${GRAPHICSMAGICK_LIB} ${GRAPHICSMAGICKXX_LIB})
 
 
 
-
-
 #################################################
 #Add joker executable and link libs
 
@@ -215,8 +228,9 @@ set(LIBRARIES ${GRAPHICSMAGICK_LIB} ${GRAPHICSMAGICKXX_LIB})
 file(GLOB SOURCES src/*.cpp) #GLOB not recomended -> add sources individually
 add_executable(joker ${SOURCES})
 
-
+if(NOT ${GM_INSTALLED})
 add_dependencies(joker GraphicsMagick_project) #builds graphicsmagick
+endif()
 include_directories(src)
 
 target_link_libraries(joker GRAPHICSMAGICK_LIB GRAPHICSMAGICKXX_LIB GraphicsMagick GraphicsMagick++ jpeg m pthread gomp)
