@@ -148,8 +148,9 @@ ExternalProject_Add(GraphicsMagick_project
 	#SOURCE_DIR ${CMAKE_CURRENT_BINARY_DIR}/GM/SRC_DIR
 	SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/External/download/GM/files
 	
-	URL ftp://ftp.graphicsmagick.org/pub/GraphicsMagick/GraphicsMagick-LATEST.tar.gz
+	#URL ftp://ftp.graphicsmagick.org/pub/GraphicsMagick/GraphicsMagick-LATEST.tar.gz
 	#DOWNLOAD_DIR ${CMAKE_CURRENT_SOURCE_DIR}
+	URL https://sourceforge.net/projects/graphicsmagick/files/graphicsmagick/1.3.35/GraphicsMagick-1.3.35.tar.gz
 	DOWNLOAD_DIR ${CMAKE_CURRENT_SOURCE_DIR}/External/download
 	 
 	CONFIGURE_COMMAND ${GM_CONFIG}
