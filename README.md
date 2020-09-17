@@ -14,15 +14,11 @@ Binaries for your system may be available on the [Releases](https://github.com/j
 
 ### Compiling from source
 
-Joker can be compiled from source using cmake, download the latest tagged release code from the main [repo page](https://github.com/jnoxro/joker)
+Joker can be compiled from source using cmake, download the latest tagged release code from the main [repo page](https://github.com/jnoxro/joker).
 
-GraphicsMagick is required for compilation, along with its dependencies.
+Cmake will downlaod and install a version of GraphicsMagick into 'External/' within the project files (this is not a system wide install and should not intefere with any other installs you have) which it will then use when building Joker.
 
-During development, GraphicsMagick 1.3.35 was used so it is recommended this version or later is installed on the compiling system. Other than GraphicsMagick, only standard C++ libraries are used, as such required libraries can be seen with the Linux command line using:
-
-`GraphicsMagick++-config --libs`
-
-Once these libraries are installed, navigate to the Joker directory and type the following commands for the simplest install:
+From with the joker project file, run the following commands in terminal:
 
 `mkdir Build`
 
@@ -34,7 +30,6 @@ Once these libraries are installed, navigate to the Joker directory and type the
 
 This will produce a 'joker' executable within the Build folder.
 
-By default -O3 compiler optimizations are applied. 
 
 
 ## Usage & Performance 
