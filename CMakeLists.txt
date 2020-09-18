@@ -258,6 +258,11 @@ include_directories(src)
 target_link_libraries(${EXE_NAME} joker GRAPHICSMAGICK_LIB GRAPHICSMAGICKXX_LIB GraphicsMagick GraphicsMagick++ jpeg m pthread gomp)
 #target_link_libraries(joker ${LIBRARIES} GraphicsMagick GraphicsMagick++ jbig tiff freetype jpeg png16 Xext SM ICE X11 lzma z m pthread gomp)
 
+
+INSTALL(TARGETS ${EXE_NAME}
+        DESTINATION bin
+)
+
 ##################################################
 
 
