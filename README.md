@@ -1,6 +1,6 @@
 # Joker
 
-Joker is a character recognition engine created with the focus of high speed on low performance systems
+Joker is a character recognition engine created with the focus of high speed
 
 ## Installation
 
