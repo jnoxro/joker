@@ -27,7 +27,7 @@
 #include <chrono>
 
 #include "train.h"
-#include "joker.h"
+#include "ocr.h"
 
 using namespace std;
 using namespace std::chrono;
@@ -138,9 +138,9 @@ int main(int argc, const char* argv[]) {
 
 		auto start = high_resolution_clock::now();
 
-		joker ocr(modelpath, threadmode, verbose);
+		ocr ocrobj(modelpath, threadmode, verbose);
 
-		string letter = ocr.initocr(filepath);
+		string letter = ocrobj.initocr(filepath);
 		cout << letter << endl;
 
 
@@ -153,7 +153,7 @@ int main(int argc, const char* argv[]) {
 
 		if (threadmode == 1)
 		{
-			ocr.endocr(); //terminate threadpool
+			ocrobj.endocr(); //terminate threadpool
 		}
 
 	}

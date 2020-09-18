@@ -193,7 +193,12 @@ endif()
 #############################################
 #create joker library
 
-add_library(joker STATIC src/imggrab.cpp src/joker.cpp src/train.cpp)
+add_library(joker STATIC src/imggrab.cpp src/ocr.cpp src/train.cpp)
+set_target_properties(joker PROPERTIES PUBLIC_HEADER "src/imggrab.h;src/ocr.h;src/train.h;src/joker.h")
+INSTALL(TARGETS joker
+        LIBRARY DESTINATION lib
+        PUBLIC_HEADER DESTINATION include/joker
+)
 
 #############################################
 

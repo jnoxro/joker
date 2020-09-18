@@ -1,5 +1,5 @@
 //============================================================================
-// Name        : joker.cpp
+// Name        : ocr.cpp
 // Author      : Jack Orton
 // Version     :
 // Copyright   : MIT License
@@ -23,14 +23,14 @@
 #include <mutex>
 #include <atomic>
 
-#include "joker.h"
+#include "ocr.h"
 #include "imggrab.h"
 
 using namespace std;
 using namespace std::chrono;
 using namespace Magick;
 
-joker::joker(string modeln, int threadmode,  int verb) //initialise
+ocr::ocr(string modeln, int threadmode,  int verb) //initialise
 {
 	modelname = modeln;
 
@@ -49,7 +49,7 @@ joker::joker(string modeln, int threadmode,  int verb) //initialise
 	}
 }
 
-void joker::loadmodel()
+void ocr::loadmodel()
 {
 
 	auto loadstart = high_resolution_clock::now();
@@ -160,7 +160,7 @@ void joker::loadmodel()
 
 }
 
-string joker::initocr(string imagepath)
+string ocr::initocr(string imagepath)
 {
 	filepath = imagepath;
 
@@ -185,7 +185,7 @@ string joker::initocr(string imagepath)
 	return result;
 }
 
-string joker::initocr(Image newimage)
+string ocr::initocr(Image newimage)
 {
 	image = newimage;
 
@@ -207,7 +207,7 @@ string joker::initocr(Image newimage)
 	return result;
 }
 
-int joker::loadimage()
+int ocr::loadimage()
 {
 
 	auto start = high_resolution_clock::now();
@@ -243,7 +243,7 @@ int joker::loadimage()
 	return 1;
 }
 
-void joker::ocrpixelavg()
+void ocr::ocrpixelavg()
 {
 	auto ocrstart = high_resolution_clock::now();
 	PixelPacket *pixels = image.getPixels(0, 0, image.columns(), image.rows());
@@ -302,7 +302,7 @@ void joker::ocrpixelavg()
 
 //Experimental::
 
-void joker::threadtest()
+void ocr::threadtest()
 {
 	auto ocrstart = high_resolution_clock::now();
 
@@ -344,7 +344,7 @@ void joker::threadtest()
 		{
 			end = end + (size%threadnum);
 		}
-		workers.push_back(thread(&joker::ocrpixelavgthreaded, this, start, end, tc, pixels));
+		workers.push_back(thread(&ocr::ocrpixelavgthreaded, this, start, end, tc, pixels));
 		//cout << tc << " " << start << " " << end << endl; //show task assignments
 	}
 
@@ -393,7 +393,7 @@ void joker::threadtest()
 
 }
 
-void joker::ocrpixelavgthreaded(int start, int end, int id, PixelPacket *pixels)
+void ocr::ocrpixelavgthreaded(int start, int end, int id, PixelPacket *pixels)
 {
 
 	auto startt = high_resolution_clock::now();
@@ -463,7 +463,7 @@ void joker::ocrpixelavgthreaded(int start, int end, int id, PixelPacket *pixels)
 
 //very experimental::
 
-void joker::initthreadpool()
+void ocr::initthreadpool()
 {
 	threadcount = thread::hardware_concurrency();
 
@@ -474,11 +474,11 @@ void joker::initthreadpool()
 
 	for (int tc = 0; tc < threadcount; tc++)
 	{
-		workers.push_back(thread(&joker::worker, this, tc)); //tc acts as thread id
+		workers.push_back(thread(&ocr::worker, this, tc)); //tc acts as thread id
 	}
 }
 
-void joker::worker(int id)
+void ocr::worker(int id)
 {
 	if (verbose == 1 || verbose == 3)
 	{
@@ -587,7 +587,7 @@ void joker::worker(int id)
 	}
 }
 
-void joker::job()
+void ocr::job()
 {
 	auto startt = high_resolution_clock::now();
 
@@ -610,7 +610,7 @@ void joker::job()
 
 }
 
-void joker::endocr()
+void ocr::endocr()
 {
 	terminator = 1;
 	for (int tc = 0; tc < threadcount; tc++)
