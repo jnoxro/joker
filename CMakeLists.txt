@@ -33,8 +33,8 @@ endif()
 
 
 #set(GM_DEFAULT_SOURCE "${CMAKE_CURRENT_SOURCE_DIR}/GraphicsMagick-LATEST.tar.gz") #change to .tar.gz or other archive
-set(GM_DEFAULT_SOURCE "${CMAKE_CURRENT_SOURCE_DIR}/External/download/GraphicsMagick-LATEST.tar.gz") #change to .tar.gz or other archive
-set(GM_DEFAULT_INSTALL "${CMAKE_CURRENT_SOURCE_DIR}/External/install/GM/usr/local/include/GraphicsMagick/Magick++.h")
+#set(GM_DEFAULT_SOURCE "${CMAKE_CURRENT_SOURCE_DIR}/External/download/GraphicsMagick-LATEST.tar.gz") #change to .tar.gz or other archive
+#set(GM_DEFAULT_INSTALL "${CMAKE_CURRENT_SOURCE_DIR}/External/install/GM/usr/local/include/GraphicsMagick/Magick++.h")
 
 ################################################
 
@@ -189,6 +189,18 @@ endif()
 
 
 
+
+#############################################
+#create joker library
+
+add_library(joker STATIC src/imggrab.cpp src/joker.cpp src/train.cpp)
+
+#############################################
+
+
+
+
+
 ##############################################
 #Add GM libraries to be linked
 
@@ -224,16 +236,21 @@ set(LIBRARIES ${GRAPHICSMAGICK_LIB} ${GRAPHICSMAGICKXX_LIB})
 #################################################
 #Add joker executable and link libs
 
+set(EXE_NAME jk)
+
 #set sources
-file(GLOB SOURCES src/*.cpp) #GLOB not recomended -> add sources individually
-add_executable(joker ${SOURCES})
+#file(GLOB SOURCES src/*.cpp) #GLOB not recomended -> add sources individually
+#add_executable(joker ${SOURCES})
+add_executable(${EXE_NAME} src/main.cpp)
 
 if(NOT ${GM_INSTALLED})
-add_dependencies(joker GraphicsMagick_project) #builds graphicsmagick
+add_dependencies(${EXE_NAME} GraphicsMagick_project) #builds graphicsmagick
 endif()
+add_dependencies(${EXE_NAME} joker)
+
 include_directories(src)
 
-target_link_libraries(joker GRAPHICSMAGICK_LIB GRAPHICSMAGICKXX_LIB GraphicsMagick GraphicsMagick++ jpeg m pthread gomp)
+target_link_libraries(${EXE_NAME} joker GRAPHICSMAGICK_LIB GRAPHICSMAGICKXX_LIB GraphicsMagick GraphicsMagick++ jpeg m pthread gomp)
 #target_link_libraries(joker ${LIBRARIES} GraphicsMagick GraphicsMagick++ jbig tiff freetype jpeg png16 Xext SM ICE X11 lzma z m pthread gomp)
 
 ##################################################
