@@ -56,7 +56,7 @@ void train::learn(std::string method, int edgesup, int neg)
 }
 
 
-void train::trainpixelavg(int edgesup)
+void train::trainpixelavg(unsigned int edgesup)
 {
 	cout << "\n[Joker] Pixel Average training" << endl;
 

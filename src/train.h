@@ -38,7 +38,7 @@ class train
 		void savemodelold(std::string mode);
 
 		//methodologies:
-		void trainpixelavg(int edgesup); //og pixel addition
+		void trainpixelavg(unsigned int edgesup); //og pixel addition
 
     public:
 		train(std::string path, std::string name); //constructor

@@ -257,8 +257,6 @@ void ocr::ocrpixelavg()
 
 	long iterend = w*h*((int)map.size()); //moved out of loop for les calcs
 	long imagelength = w*h;
-	long tempcount = 0;
-	long tempcount2 = 0;
 	for (long iter = 0; iter < iterend; iter++)
 	{
 		tempscore = tempscore + (((((int)pixels[counter1].red)/255)*2)-1) * model[iter];
