@@ -16,7 +16,9 @@ Binaries for your system may be available on the [Releases](https://github.com/j
 
 Joker can be compiled from source using cmake, download the latest tagged release code from the main [repo page](https://github.com/jnoxro/joker).
 
-Cmake will download and install a version of GraphicsMagick into 'External/' within the project files (this is not a system wide install and should not intefere with any other installs you have) which it will then use when building Joker.
+Make sure you have the following shared libraries inatalled:
+ - libjpeg-turbo (often preinstalled on linux)
+ - pthread (often preinstalled on linux)
 
 From within the joker project file, run the following commands in terminal:
 
@@ -25,12 +27,6 @@ From within the joker project file, run the following commands in terminal:
 `cd Build`
 
 `cmake ..`
-
-optional cmake -D flags:
-- GM_VERSION=x.x.x specify a specific version on GraphicsMagick to be downloaded (default is 1.3.35)
-- GM_SOURCE=x provide an alternative (relative) filepath to a GraphicsMagick archive which you have downlaoded elsewhere (default is /External/download/GraphicsMagick-${GM_VERSION}.tar.gz - where ${GM_VERSION} is the version above)
-
-eg: `cmake -DGM_VERSION=1.3.34 ..`
 
 `make`
 
