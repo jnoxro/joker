@@ -17,7 +17,7 @@ Binaries for your system may be available on the [Releases](https://github.com/j
 Joker can be compiled from source using cmake, download the latest tagged release code from the main [repo page](https://github.com/jnoxro/joker).
 
 Make sure you have the following shared libraries inatalled:
- - libjpeg-turbo (often preinstalled on linux)
+ - libjpeg-turbo-dev (often preinstalled on linux, current ubuntu: libjpeg-turbo8-dev)
  - pthread (often preinstalled on linux)
 
 From within the joker project file, run the following commands in terminal:
