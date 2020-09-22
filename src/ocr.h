@@ -9,12 +9,14 @@
 #ifndef OCR_H_
 #define OCR_H_
 
-#include <Magick++.h>
+//#include <Magick++.h>
 #include <string>
 #include <vector>
 #include <thread>
 #include <mutex>
 #include <atomic>
+
+#include "imgvect.h"
 
 class ocr
 {
@@ -31,7 +33,8 @@ class ocr
 
 		std::string filepath;
 
-		Magick::Image image;
+		//Magick::Image image;
+		imgvect image;
 
 		int verbose;
 
@@ -57,8 +60,8 @@ class ocr
 		std::mutex mtx3;
 		std::vector<int> threadoutputs;
 
-		void threadtest();
-		void ocrpixelavgthreaded(int start, int end, int id, Magick::PixelPacket *pixels);
+		//void threadtest();
+		//void ocrpixelavgthreaded(int start, int end, int id, Magick::PixelPacket *pixels);
 
 
 
@@ -82,7 +85,7 @@ class ocr
 		std::atomic<int> newwork{0};
 		std::atomic<int> fin{0};
 
-		Magick::PixelPacket *poolpixels;
+		//Magick::PixelPacket *poolpixels;
 
 		void initthreadpool();
 		void worker(int id);
@@ -93,7 +96,7 @@ class ocr
         ocr(std::string modeln, int threadmode, int verb);  //constructor
 
         std::string initocr(std::string imagepath);
-        std::string initocr(Magick::Image newimage); //overload allows image to be directly passed
+        //std::string initocr(Magick::Image newimage); //overload allows image to be directly passed
 
         void endocr();
 

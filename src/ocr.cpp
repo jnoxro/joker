@@ -15,7 +15,7 @@
 #include <iomanip>
 #include <stdlib.h>
 #include <fstream>
-#include <Magick++.h>
+//#include <Magick++.h>
 #include <vector>
 #include <string>
 #include <thread>
@@ -24,11 +24,12 @@
 #include <atomic>
 
 #include "ocr.h"
-#include "imggrab.h"
+#include "imgvect.h"
+//#include "imggrab.h"
 
 using namespace std;
 using namespace std::chrono;
-using namespace Magick;
+//using namespace Magick;
 
 ocr::ocr(string modeln, int threadmode,  int verb) //initialise
 {
@@ -184,7 +185,7 @@ string ocr::initocr(string imagepath)
 
 	return result;
 }
-
+/*
 string ocr::initocr(Image newimage)
 {
 	image = newimage;
@@ -206,13 +207,13 @@ string ocr::initocr(Image newimage)
 	}
 	return result;
 }
-
+*/
 int ocr::loadimage()
 {
 
 	auto start = high_resolution_clock::now();
 
-
+	/*
 	imggrab fetcher;
 	if (fetcher.grab(filepath) == 0)
 	{
@@ -232,6 +233,21 @@ int ocr::loadimage()
 			exit(EXIT_FAILURE);
 		}
 	}
+	*/
+
+
+	if(image.read(filepath, 125) == 0) //threshold of 125
+	{
+		cerr << "[Joker] Error: image load fail" << endl;
+		exit(EXIT_FAILURE);
+		return 0;
+	}
+	else if(image.height() != h || image.width() != w)
+	{
+		cerr << "[Joker] Error: Image does not match model dimensions" << endl;
+		exit(EXIT_FAILURE);
+
+	}
 
 	if (verbose == 1 || verbose == 3)
 	{
@@ -246,7 +262,7 @@ int ocr::loadimage()
 void ocr::ocrpixelavg()
 {
 	auto ocrstart = high_resolution_clock::now();
-	PixelPacket *pixels = image.getPixels(0, 0, image.columns(), image.rows());
+	//PixelPacket *pixels = image.getPixels(0, 0, image.columns(), image.rows());
 
 	long score = -100000;
 	long tempscore = 0;
@@ -259,7 +275,8 @@ void ocr::ocrpixelavg()
 	long imagelength = w*h;
 	for (long iter = 0; iter < iterend; iter++)
 	{
-		tempscore = tempscore + (((((int)pixels[counter1].red)/255)*2)-1) * model[iter];
+		//tempscore = tempscore + (((((int)pixels[counter1].red)/255)*2)-1) * model[iter];
+		tempscore = tempscore + (image[counter1]-1) * model[iter];
 		counter1++;
 
 
@@ -299,7 +316,7 @@ void ocr::ocrpixelavg()
 
 
 //Experimental::
-
+/*
 void ocr::threadtest()
 {
 	auto ocrstart = high_resolution_clock::now();
@@ -408,7 +425,7 @@ void ocr::ocrpixelavgthreaded(int start, int end, int id, PixelPacket *pixels)
 	mtx1.unlock();
 	*/
 
-
+/*
 	long score = -100000;
 	long tempscore = 0;
 	int letter = 0;
@@ -457,7 +474,7 @@ void ocr::ocrpixelavgthreaded(int start, int end, int id, PixelPacket *pixels)
 		cout <<  "[Joker] Thread " << id << " time: "<< duration.count() << " microsecs" <<endl;
 	}
 }
-
+*/
 
 //very experimental::
 
@@ -533,7 +550,8 @@ void ocr::worker(int id)
 			{
 				for (long iter = 0; iter < iterend; iter++) //*1 for now as one job is one comparison
 				{
-					tempscore = tempscore + (((((int)poolpixels[counter1].red)/255)*2)-1) * model[(modelstart) + iter];
+					//tempscore = tempscore + (((((int)poolpixels[counter1].red)/255)*2)-1) * model[(modelstart) + iter];
+					tempscore = tempscore + (image[counter1]-1) * model[(modelstart) + iter];
 					counter1++;
 
 					if (counter1 == imagelength) //||counter==0
@@ -589,7 +607,7 @@ void ocr::job()
 {
 	auto startt = high_resolution_clock::now();
 
-	poolpixels = image.getPixels(0, 0, image.columns(), image.rows());
+	//poolpixels = image.getPixels(0, 0, image.columns(), image.rows());
 
 	queue = map.size();
 	newwork = 1;

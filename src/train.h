@@ -10,10 +10,11 @@
 #define TRAIN_H_
 
 #include <string>
-#include <Magick++.h>
+//#include <Magick++.h>
 #include <vector>
 
-#include "imggrab.h"
+#include "imgvect.h"
+//#include "imggrab.h"
 
 class train
 {
@@ -27,9 +28,10 @@ class train
 		unsigned int w;
 		int negscore;
 
-		imggrab fetcher;
+		//imggrab fetcher;
+		imgvect image;
 
-		Magick::Image image;
+		//Magick::Image image;
 
 		std::vector<std::string> map;
 		std::vector<int> model;

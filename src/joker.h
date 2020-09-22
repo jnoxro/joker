@@ -11,6 +11,7 @@
 
 #include "ocr.h"
 #include "train.h"
-#include "imggrab.h"
+//#include "imggrab.h"
+#include "imgvect.h"
 
 #endif /* JOKER_H_ */

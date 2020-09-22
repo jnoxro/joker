@@ -23,18 +23,19 @@
 
 #include <string>
 #include <iostream>
-#include <Magick++.h>
+//#include <Magick++.h>
 #include <chrono>
 
 #include "train.h"
 #include "ocr.h"
 
+
 using namespace std;
 using namespace std::chrono;
-using namespace Magick;
+//using namespace Magick;
 
 int main(int argc, const char* argv[]) {
-	InitializeMagick(NULL);
+	//InitializeMagick(NULL);
 
 	//defaults//
 	string filepath = "test.jpg";

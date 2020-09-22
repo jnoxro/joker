@@ -14,15 +14,16 @@
 #include <iomanip>
 #include <stdlib.h>
 #include <fstream>
-#include <Magick++.h>
+//#include <Magick++.h>
 #include <vector>
 #include <string>
 
 #include "train.h"
-#include "imggrab.h"
+#include "imgvect.h"
+//#include "imggrab.h"
 
 using namespace std;
-using namespace Magick;
+//using namespace Magick;
 
 
 train::train(std::string path, std::string name) //initialise
@@ -76,31 +77,32 @@ void train::trainpixelavg(unsigned int edgesup)
 	cout << "[Joker] Library size:   " << map.size()-1 << endl;
 	cout << "[Joker] File Extension: " << map[0] << endl;
 
-	ColorRGB pixcol;
+	//ColorRGB pixcol;
 	int lettercount = 0;
 	for (long unsigned int i = 1; i < map.size(); i++)
 	{
 		int counter = 0;
 		while (1)
 		{
-			if (fetcher.grab(datapath + "/" + map[i] + "/" + to_string(counter) + map[0]) == 1)
+			//if (fetcher.grab(datapath + "/" + map[i] + "/" + to_string(counter) + map[0]) == 1)
+			if (image.read((string)(datapath + "/" + map[i] + "/" + to_string(counter) + map[0]), 125) == 1)
 			{
-				image = fetcher.give();
+				//image = fetcher.give();
 
 				if (h == 0)
 				{
-					h = image.rows();
-					w = image.columns();
+					h = image.height();
+					w = image.width();
 
 					cout << "[Joker] Detected dimension: " << h << "*" << w << "\n" << endl;
 				}
-				else if (image.rows() != h || image.columns() != w)
+				else if (image.height() != h || image.width() != w)
 				{
 					cerr << "[Joker] Error: dimension mismatch: " << map[i] << "/" << counter  << map[0] << " not: " << h << "*" << w << endl;
 					exit(EXIT_FAILURE);
 				}
 
-				image.threshold(125);
+				//image.threshold(125);
 
 				//nasty code for now
 				//pixelColor on image itself is slow should use image cache
@@ -108,9 +110,10 @@ void train::trainpixelavg(unsigned int edgesup)
 				{
 					for (unsigned int k = 0; k < w; k++)
 					{
-						pixcol = image.pixelColor(k,j);  //flipped j,k so model is height * width
+						//pixcol = image.pixelColor(k,j);  //flipped j,k so model is height * width
 
-						if (pixcol.red() == 0)
+						//if (pixcol.red() == 0)
+						if (image[(j*w)+k] == 0)
 						{
 							if (counter == 0)
 							{
