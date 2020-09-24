@@ -24,7 +24,7 @@ class imgvect
 		imgvect(); //constructor
 
 		std::vector<int> imgcontainer; //making this public allows direct index access wihtout overloading operator[] - faster
-		int operator[](int); //allow index access to imgcontainer
+		//int operator[](int); //allow index access to imgcontainer
 		int read(std::string fname, int threshold);
 
 		int width();

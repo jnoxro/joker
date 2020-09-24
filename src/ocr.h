@@ -12,42 +12,50 @@
 #include <vector>
 #include <string>
 #include <atomic>
+#include <mutex>
+#include <tuple>
 
 #include "imgvect.h"
 #include "model.h"
+#include "timer.h"
 
 class ocr
 {
 
     private:
-
+		timer timer1; //timer to time functions
 		model mymodel; //model handler
 		imgvect image; //image handler
 
-		int verbosity = 0; //control cout's
-		bool extrathreads = false; //signify if external threads will be working on job
+		int verbosity = 0; //control what is displayed, 1 = times, 2 = ocr scores, 3 = both
 
-		void solvepixelaverage(std::vector<long> target, int mapbegin, int mapend); //method for pixelaverage solving, used by one or many threads
+		void solvepixelaverage(int imgindex, int mapbegin, int mapend); //method for pixelaverage solving, used by one or many threads
 
-		std::atomic<bool> terminate; //used to signal threads to close
-		void initthreadpool(int threads);
+		void initthreadpool(int threads); //create threads which wait for jobs
 
-		void addjob(); //add job to queue
+		void addjob(); //add job
+		int assignmentqueue = 0; //map indexes which still need comparing, reduces from (mapsize-1) -> 0, reduced by thread assignment size (mapsize/(worker count))
+		std::mutex assignmentqueuemtx; //mutex to check queue
+
+		int assignmentsfinished = 0; //amount of assignments completed, when this = map.size then job is finished
+		std::string finalresult = ""; //best result
+		long finalscore = -500000;
+		std::mutex assignmentfinishedmutex; //mutex check results
+
 		void worker(int id, int numworkers); //worker carries out job
+		std::vector<std::thread> threadpool;
 
-		//note for threads
-		//threads user definable in ocr call (below)
-		//0 - auto threadcount
-		//1 - run in main script (dont make any threads)
-		//2+ - make that many threads
+		bool extrathreads = false; //signify if external threads will be working on job
+		int workercount = 1; //amount of workers
+		std::atomic<bool> terminate; //used to signal threads to close
+
+
     public:
 		ocr(std::string modelname, int threads, int verbose); //constructor
 
-		void solve(std::vector<long> target); //user can pass custom vector or imgvect.imgcontainer
-		void solve(std::string filepath); //user can pass filepath to open image with imgvect.cpp
+		std::tuple<std::string, long> solve(std::vector<long> target); //user can pass custom vector or imgvect.imgcontainer
+		std::tuple<std::string, long> solve(std::string filepath); //user can pass filepath to open image with imgvect.cpp
 
-		std::string finalresult = ""; //user accessible results
-		long finalscore = -500000;
 
 		int endocr(); //terminate the threadpool
 
