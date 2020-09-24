@@ -119,3 +119,20 @@ void model::pasave(string modelname)
 	output.close();
 }
 
+void model::load(string modelname)
+{
+	if (methodology == "pixelaverage")
+	{
+		paload(modelname);
+	}
+	else
+	{
+		cerr << "Joker: Error: Model: unknown load method for methodology: " << methodology << endl;
+		exit(EXIT_FAILURE);
+	}
+}
+
+void model::paload(string modelname)
+{
+
+}
