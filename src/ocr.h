@@ -9,11 +9,8 @@
 #ifndef OCR_H_
 #define OCR_H_
 
-//#include <Magick++.h>
-#include <string>
 #include <vector>
-#include <thread>
-#include <mutex>
+#include <string>
 #include <atomic>
 
 #include "imgvect.h"
@@ -23,88 +20,36 @@ class ocr
 {
 
     private:
-		std::string result;
-		long globalscore = -100000;
 
-		/*
-		std::vector<long> model;
-		std::vector<std::string> map;
+		model mymodel; //model handler
+		imgvect image; //image handler
 
-		std::string modelname;
-		std::string modeltype;
+		int verbosity = 0; //control cout's
+		bool extrathreads = false; //signify if external threads will be working on job
 
-		std::string filepath;
-		 */
+		void solvepixelaverage(std::vector<long> target, int mapbegin, int mapend); //method for pixelaverage solving, used by one or many threads
 
-		model mymodel;
-		//Magick::Image image;
-		imgvect image;
+		std::atomic<bool> terminate; //used to signal threads to close
+		void initthreadpool(int threads);
 
-		int verbose;
+		void addjob(); //add job to queue
+		void worker(int id, int numworkers); //worker carries out job
 
-		int h;
-		int w;
-
-		void loadmodel();
-		int loadimage(std::string imagepath);
-		void ocrpixelavg();
-
-
-
-		// Experimental thread testing::
-
-		//each thread outputs the score for a letter in the letters respective map position
-		//EG if threadoutputs.at(4) = 5000 then the letter at map.at(4) has that score
-		// https://stackoverflow.com/questions/45720829/can-two-threads-write-to-different-element-of-the-same-array
-		int threading;
-
-		std::mutex mtx; //mutex for locking threads
-		std::mutex mtx1;
-		std::mutex mtx2;
-		std::mutex mtx3;
-		std::vector<int> threadoutputs;
-
-		//void threadtest();
-		//void ocrpixelavgthreaded(int start, int end, int id, Magick::PixelPacket *pixels);
-
-
-
-
-		//*********//
-		//threadpooling should use resources better
-
-		std::vector<std::thread> workers;
-
-		std::mutex poolmtx;
-		std::mutex poolmtx0;
-		std::mutex poolmtx1;
-		std::mutex poolmtx2;
-		std::mutex poolmtx3;
-		std::mutex poolmtx4;
-
-		int threadcount;
-		//int newwork; //signifies new work available
-		int queue; //queue would just hold numbers of map positions, instead threads can just reduce int by 1 to take a job.
-		int terminator; //set to 1 to end worker loops
-		std::atomic<int> newwork{0};
-		std::atomic<int> fin{0};
-
-		//Magick::PixelPacket *poolpixels;
-
-		void initthreadpool();
-		void worker(int id, int of);
-		void job();
-
+		//note for threads
+		//threads user definable in ocr call (below)
+		//0 - auto threadcount
+		//1 - run in main script (dont make any threads)
+		//2+ - make that many threads
     public:
+		ocr(std::string modelname, int threads, int verbose); //constructor
 
-        ocr(std::string modeln, int threadmode, int verb);  //constructor
+		void solve(std::vector<long> target); //user can pass custom vector or imgvect.imgcontainer
+		void solve(std::string filepath); //user can pass filepath to open image with imgvect.cpp
 
-        std::string initocr(std::string imagepath);
-        //std::string initocr(Magick::Image newimage); //overload allows image to be directly passed
+		std::string finalresult = ""; //user accessible results
+		long finalscore = -500000;
 
-        void endocr();
-
-
+		int endocr(); //terminate the threadpool
 
 };
 
