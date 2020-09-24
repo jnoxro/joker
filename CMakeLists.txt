@@ -21,8 +21,8 @@ endif()
 #############################################
 #create joker library
 
-add_library(joker STATIC src/imgvect.cpp src/ocr.cpp src/train.cpp)
-set_target_properties(joker PROPERTIES PUBLIC_HEADER "src/imgvect.h;src/ocr.h;src/train.h;src/joker.h")
+add_library(joker STATIC src/imgvect.cpp src/model.cpp src/ocr.cpp src/trainer.cpp)
+set_target_properties(joker PROPERTIES PUBLIC_HEADER "src/joker.h")
 INSTALL(TARGETS joker
         LIBRARY DESTINATION lib
         PUBLIC_HEADER DESTINATION include/joker
