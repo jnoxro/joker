@@ -23,8 +23,9 @@
 #include <mutex>
 #include <atomic>
 
-#include "ocr.h"
-#include "imgvect.h"
+#include "joker.h"
+//#include "ocr.h"
+//#include "imgvect.h"
 //#include "imggrab.h"
 
 using namespace std;
@@ -276,7 +277,7 @@ void ocr::ocrpixelavg()
 	for (long iter = 0; iter < iterend; iter++)
 	{
 		//tempscore = tempscore + (((((int)pixels[counter1].red)/255)*2)-1) * model[iter];
-		tempscore = tempscore + (image[counter1]-1) * model[iter];
+		tempscore = tempscore + ((2*image[counter1])-1) * model[iter];
 		counter1++;
 
 

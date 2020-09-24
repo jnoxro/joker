@@ -18,8 +18,9 @@
 #include <vector>
 #include <string>
 
-#include "train.h"
-#include "imgvect.h"
+#include "joker.h"
+//#include "train.h"
+//#include "imgvect.h"
 //#include "imggrab.h"
 
 using namespace std;
@@ -56,7 +57,30 @@ void train::learn(std::string method, int edgesup, int neg)
 	}
 }
 
+void train::trainpixelavg(unsigned int edgesup)
+{
+	cout << "\n[Joker] Pixel Average training" << endl;
 
+	ifstream input(datapath + "/map.txt");
+	if (!input.is_open())
+	{
+		cerr << "[Joker] Error: Unable to open map" << endl;
+		exit(EXIT_FAILURE);
+	}
+
+	for(string line; getline( input, line ); )
+	{
+	    map.push_back(line);
+	}
+	input.close();
+
+	cout << "[Joker] Library size:   " << map.size()-1 << endl;
+	cout << "[Joker] File Extension: " << map[0] << endl;
+
+
+}
+
+/*
 void train::trainpixelavg(unsigned int edgesup)
 {
 	cout << "\n[Joker] Pixel Average training" << endl;
@@ -162,6 +186,7 @@ void train::trainpixelavg(unsigned int edgesup)
 
 
 }
+*/
 
 void train::savemodel()
 {

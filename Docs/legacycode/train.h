@@ -13,7 +13,8 @@
 //#include <Magick++.h>
 #include <vector>
 
-#include "imgvect.h"
+#include "joker.h"
+//#include "imgvect.h"
 //#include "imggrab.h"
 
 class train

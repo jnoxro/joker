@@ -10,8 +10,11 @@
 #define JOKER_H_
 
 #include "ocr.h"
-#include "train.h"
+//#include "train.h"
+#include "trainer.h"
 //#include "imggrab.h"
 #include "imgvect.h"
+
+#include "model.h"
 
 #endif /* JOKER_H_ */

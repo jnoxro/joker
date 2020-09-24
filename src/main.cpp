@@ -26,7 +26,8 @@
 //#include <Magick++.h>
 #include <chrono>
 
-#include "train.h"
+#include "joker.h"
+#include "trainer.h"
 #include "ocr.h"
 
 
@@ -47,7 +48,7 @@ int main(int argc, const char* argv[]) {
 	int verbose = 0;
 	int mode = 0;
 	int e = 0;
-	int negscore = -1;
+	int negscore = -5;
 
 	void welcome();
 
@@ -129,8 +130,11 @@ int main(int argc, const char* argv[]) {
 
 	if (mode == 2)
 	{
-		train trainer(datapath, newmodel);
-		trainer.learn(method, e, negscore);
+		//train trainer(datapath, newmodel);
+		//trainer.learn(method, e, negscore);
+
+		trainer train;
+		train.learnpixelavarage(datapath, newmodel, e, negscore);
 	}
 
 	if (mode == 1)
