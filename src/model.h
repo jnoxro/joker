@@ -18,9 +18,6 @@
 class model
 {
 	private:
-		//universal parameters
-		std::string methodology;
-
 
 		//pamodelstruct pamodel;
 
@@ -35,6 +32,8 @@ class model
 	public:
 		model();
 
+		//universal parameters
+		std::string methodology;
 
 		struct pamodelstruct //pixelaverage model
 		{

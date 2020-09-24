@@ -99,12 +99,12 @@ int imgvect::readjpg(string fname, int threshold)
 				}
 				else if((temp >= threshold) && (threshold < 256))
 				{
-					imgcontainer.push_back(1); //pushing back 1-0 instead of 256-0
+					imgcontainer.push_back(0); //pushing back 1-0 instead of 256-0, inverse action also carried out here
 					retval = 1;
 				}
 				else if((temp < threshold) && (threshold > 0))
 				{
-					imgcontainer.push_back(0);
+					imgcontainer.push_back(1);
 					retval = 1;
 				}
 				else

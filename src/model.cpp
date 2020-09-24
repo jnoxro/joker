@@ -63,13 +63,12 @@ void model::pasave(string modelname)
 	output << pamodel.width << endl;
 	output << pamodel.negativescore << endl;
 
-	output << "map::" << endl;
 	for (long unsigned int iter = 1; iter < pamodel.map.size(); iter++) //add map to file
 	{
 		output << pamodel.map[iter] << endl;
 	}
 
-	output << "model::" << endl;
+	output << "::" << endl;
 	long val;
 	long lastval = -1; //set to below min val to signify first run of loop
 	long repeatcount = 0; //how many MORE times val is repeated after first
@@ -85,7 +84,7 @@ void model::pasave(string modelname)
 		}
 		else
 		{
-			if (lastval < 1) //if first loop then just write the first value.
+			if (lastval == -1) //if first loop then just write the first value.
 			{
 				output << val << endl;
 				lastval = val; saved++;
@@ -121,6 +120,15 @@ void model::pasave(string modelname)
 
 void model::load(string modelname)
 {
+	ifstream modelfile(modelname + ".jkr");
+	if (!modelfile.is_open())
+	{
+		cerr << "[Joker] Error: Model: load: Unable to open" << modelname << ".jkr" << endl;
+		exit(EXIT_FAILURE);
+	}
+	getline(modelfile, methodology);
+
+
 	if (methodology == "pixelaverage")
 	{
 		paload(modelname);
@@ -134,5 +142,90 @@ void model::load(string modelname)
 
 void model::paload(string modelname)
 {
+	ifstream modelfile(modelname + ".jkr");
+	if (!modelfile.is_open())
+	{
+		cerr << "[Joker] Error: Model: paload: Unable to open" << modelname << ".jkr" << endl;
+		exit(EXIT_FAILURE);
+	}
 
+	int readmode = 0;
+	long modelval = 0;
+	int modellastval = 0;
+	for(string line; getline(modelfile, line ); )
+	{
+		switch (readmode)
+		{
+		case 0:
+			methodology = line;
+			readmode = 1;
+			break;
+
+		case 1:
+			pamodel.height = stoi(line);
+			readmode = 2;
+			break;
+
+		case 2:
+			pamodel.width = stoi(line);
+			readmode = 3;
+			break;
+
+		case 3:
+			pamodel.negativescore = stoi(line);
+			readmode = 4;
+			break;
+
+		case 4:
+			if (line != "::")
+			{
+				pamodel.map.push_back(line);
+			}
+			else
+			{
+				readmode = 5;
+			}
+			break;
+
+		case 5:
+			modelval = stol(line);
+			if (modelval >= 0)
+			{
+				modellastval = (int)modelval;
+				if (modelval == 0)
+				{
+					pamodel.model.push_back(pamodel.negativescore); //actual model values are 0-1000 for now so int
+				}
+				else
+				{
+					pamodel.model.push_back(modelval); //actual model values are 0-1000 for now so int
+				}
+			}
+			else
+			{
+				for (long iter = 0; iter > modelval; iter--)
+				{
+					if (modellastval == 0)
+					{
+						pamodel.model.push_back(pamodel.negativescore); //actual model values are 0-1000 for now so int
+					}
+					else
+					{
+						pamodel.model.push_back(modelval); //actual model values are 0-1000 for now so int
+					}
+				}
+			}
+			break;
+
+		default:
+			cerr << "[Joker] Error: Model: paload: switch/case defaulted" << endl;
+			modelfile.close();
+			exit(EXIT_FAILURE);
+		}
+	}
+	if (pamodel.model.size() == 0)
+	{
+		cerr << "[Joker] Warning: Model: paload: loaded model size is 0" << endl;
+	}
+	modelfile.close();
 }

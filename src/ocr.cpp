@@ -34,7 +34,6 @@ using namespace std::chrono;
 
 ocr::ocr(string modeln, int threadmode,  int verb) //initialise
 {
-	modelname = modeln;
 
 	threading = threadmode;
 	verbose = verb;
@@ -43,14 +42,34 @@ ocr::ocr(string modeln, int threadmode,  int verb) //initialise
 	newwork = 0; //signifies new work available
 	queue = 0; //queue would just hold numbers of map positions, instead threads can just reduce int by 1 to take a job.
 	terminator = 0; //set to 1 to end worker loops
-	loadmodel();
+
+	auto start = high_resolution_clock::now();
+	mymodel.load(modeln);
+	if (verbose == 1 || verbose == 3)
+	{
+		auto stop = high_resolution_clock::now();
+		auto duration = duration_cast<microseconds>(stop - start);
+		cout <<  "[Joker] Ocr: model load time: "<< duration.count() << " microsecs" << endl;
+	}
+	w = mymodel.pamodel.width;
+	h = mymodel.pamodel.height;
+
+	/*
+	cout << "model info:" << endl;
+	cout << "method: " << mymodel.methodology << endl;
+	cout << "w*h: " << w << "*" << h << endl;
+	cout << "map & model sizes: " << mymodel.pamodel.map.size() << " " << mymodel.pamodel.model.size() << endl;
+	cout << "expected model size: " << w*h*26 << endl;
+	 */
 
 	if (threading == 1)
 	{
 		initthreadpool();
 	}
+
 }
 
+/*
 void ocr::loadmodel()
 {
 
@@ -161,103 +180,76 @@ void ocr::loadmodel()
 	}
 
 }
+*/
 
 string ocr::initocr(string imagepath)
 {
-	filepath = imagepath;
-
-	if (modeltype == "pixelaverage")
+	if (mymodel.methodology == "pixelaverage")
 	{
-		if (loadimage() == 1)
+		if (loadimage(imagepath) == 1)
 		{
 			if (threading == 1)
 			{
-
 				//threadtest();
-
-				job(); //add job to threadpool
+				job(); //add job to threadpool and wait till done
 			}
 			else
 			{
 				ocrpixelavg();
 			}
 		}
-	}
 
-	return result;
-}
-/*
-string ocr::initocr(Image newimage)
-{
-	image = newimage;
-
-	if (modeltype == "pixelaverage")
-	{
-		if (threading == 1)
-		{
-
-//			threadtest();
-
-			job();
-
-		}
 		else
 		{
-			ocrpixelavg();
+			cout << "an odd occurance" << endl;
+			result = "";
 		}
 	}
+
 	return result;
 }
-*/
-int ocr::loadimage()
+
+
+int ocr::loadimage(string imagepath)
 {
 
 	auto start = high_resolution_clock::now();
 
-	/*
-	imggrab fetcher;
-	if (fetcher.grab(filepath) == 0)
-	{
-		cerr << "[Joker] Error: image load fail" << endl;
-		exit(EXIT_FAILURE);
-		return 0;
-	}
-	else
-	{
-		image = fetcher.give();
+	int retval = 0;
 
-		image.threshold(125);
-		//image.negate();
-		if (image.rows() != h || image.columns() != w)
+	switch (image.read(imagepath, 125))
+	{
+	case 1:
+		if(image.height() != h || image.width() != w)
 		{
-			cerr << "[Joker] Error: Image does not match model dimensions" << endl;
-			exit(EXIT_FAILURE);
+			cerr << "[Joker] Error: ocr: loadimage: Image does not match model dimensions" << endl;
+			retval = 0;
 		}
-	}
-	*/
+		else
+		{
+			retval = 1;
+		}
+		break;
 
+	case 0:
+		cerr << "[Joker] Error: ocr: loadimage: image load fail" << endl;
+		retval = 0;
+		break;
 
-	if(image.read(filepath, 125) == 0) //threshold of 125
-	{
-		cerr << "[Joker] Error: image load fail" << endl;
+	default:
+		cerr << "[Joker] Error: ocr: loadimage: unknown image load output - aborting" << endl;
 		exit(EXIT_FAILURE);
-		return 0;
 	}
-	else if(image.height() != h || image.width() != w)
-	{
-		cerr << "[Joker] Error: Image does not match model dimensions" << endl;
-		exit(EXIT_FAILURE);
 
-	}
 
 	if (verbose == 1 || verbose == 3)
 	{
 		auto stop = high_resolution_clock::now();
 		auto duration = duration_cast<microseconds>(stop - start);
-		cout <<  "[Joker] Image load time: "<< duration.count() << " microsecs" <<endl;
+		cout <<  "[Joker] OCR: Image load time: "<< duration.count() << " microsecs" << endl;
 	}
 
-	return 1;
+	return retval;
 }
 
 void ocr::ocrpixelavg()
@@ -272,12 +264,15 @@ void ocr::ocrpixelavg()
 	long counter1 = 0; //to image pixel count
 	long counter2 = 0; //map pos counter
 
-	long iterend = w*h*((int)map.size()); //moved out of loop for les calcs
+	long iterend = w*h*((int)mymodel.pamodel.map.size()); //moved out of loop for less calcs
 	long imagelength = w*h;
+
 	for (long iter = 0; iter < iterend; iter++)
 	{
 		//tempscore = tempscore + (((((int)pixels[counter1].red)/255)*2)-1) * model[iter];
-		tempscore = tempscore + ((2*image[counter1])-1) * model[iter];
+		//tempscore = tempscore + ((2*image[counter1])-1) * mymodel.pamodel.model[iter];
+		//tempscore += (2*(image[counter1])-1) * mymodel.pamodel.model[iter];
+		tempscore += (2*(image.imgcontainer[counter1])-1) * mymodel.pamodel.model[iter];
 		counter1++;
 
 
@@ -290,7 +285,7 @@ void ocr::ocrpixelavg()
 			}
 			if ((verbose == 2 || verbose == 3) && counter1 > 0)
 			{
-				cout << "[Joker] "<< map[counter2] << " | " << tempscore << endl;
+				cout << "[Joker] "<< mymodel.pamodel.map[counter2] << " | " << tempscore << endl;
 			}
 			if (counter1 != 0)
 			{
@@ -304,7 +299,7 @@ void ocr::ocrpixelavg()
 	}
 
 	//cout << map.at(letter) << endl;
-	result = map[letter];
+	result = mymodel.pamodel.map[letter];
 
 	if (verbose == 1 || verbose == 3)
 	{
@@ -315,167 +310,6 @@ void ocr::ocrpixelavg()
 
 }
 
-
-//Experimental::
-/*
-void ocr::threadtest()
-{
-	auto ocrstart = high_resolution_clock::now();
-
-	PixelPacket *pixels = image.getPixels(0, 0, image.columns(), image.rows());
-
-	int threadnum = thread::hardware_concurrency();
-	if (verbose == 1 || verbose == 3)
-	{
-		cout << "[Joker] Possible concurrent threads: " << threadnum << endl;
-	}
-
-	if (verbose == 1 || verbose == 3)
-	{
-		auto ocrstop = high_resolution_clock::now();
-		auto duration = duration_cast<microseconds>(ocrstop - ocrstart);
-		cout <<  "[Joker] 1: "<< duration.count() << " microsecs" <<endl;
-	}
-
-	vector<thread> workers;
-	int size = map.size();
-	for (unsigned int ms = 0; ms < map.size(); ms++)
-	{
-		threadoutputs.push_back(0); //expand output storage to correct size
-	}
-
-	if (verbose == 1 || verbose == 3)
-	{
-		auto ocrstop = high_resolution_clock::now();
-		auto duration = duration_cast<microseconds>(ocrstop - ocrstart);
-		cout <<  "[Joker] 2: "<< duration.count() << " microsecs" <<endl;
-	}
-
-
-	for (int tc = 0; tc < threadnum; tc++)
-	{
-		int start = tc*(size/threadnum);
-		int end = (tc*(size/threadnum) + (size/threadnum));
-		if (tc == threadnum-1)
-		{
-			end = end + (size%threadnum);
-		}
-		workers.push_back(thread(&ocr::ocrpixelavgthreaded, this, start, end, tc, pixels));
-		//cout << tc << " " << start << " " << end << endl; //show task assignments
-	}
-
-	if (verbose == 1 || verbose == 3)
-	{
-		auto ocrstop = high_resolution_clock::now();
-		auto duration = duration_cast<microseconds>(ocrstop - ocrstart);
-		cout <<  "[Joker] 3: "<< duration.count() << " microsecs" <<endl;
-	}
-
-	for (int tc = 0; tc < threadnum; tc++)
-	{
-		workers[tc].join();
-	}
-
-	if (verbose == 1 || verbose == 3)
-	{
-		auto ocrstop = high_resolution_clock::now();
-		auto duration = duration_cast<microseconds>(ocrstop - ocrstart);
-		cout <<  "[Joker] 4: "<< duration.count() << " microsecs" <<endl;
-	}
-
-	long score = -100000;
-	int pos = 0;
-
-	for (unsigned int ms = 0; ms < map.size(); ms++)
-	{
-		//uncomment to see received high scores (1 per thread):
-		//cout << map.at(ms) << " " << threadoutputs.at(ms) << endl;
-
-		if (threadoutputs[ms] > score && threadoutputs[ms] != 0)
-		{
-			score = threadoutputs[ms];
-			pos = ms;
-		}
-	}
-	//cout << map.at(pos) << endl;
-	result = map.at(pos);
-
-	if (verbose == 1 || verbose == 3)
-	{
-		auto ocrstop = high_resolution_clock::now();
-		auto duration = duration_cast<microseconds>(ocrstop - ocrstart);
-		cout <<  "[Joker] Raw threaded OCR time: "<< duration.count() << " microsecs" <<endl;
-	}
-
-}
-
-void ocr::ocrpixelavgthreaded(int start, int end, int id, PixelPacket *pixels)
-{
-
-	auto startt = high_resolution_clock::now();
-
-	/*
-	mtx.lock();
-	PixelPacket *pixels = image.getPixels(0, 0, image.columns(), image.rows()); //30-50 microsecs
-	mtx.unlock();
-	*/
-
-	/*
-	mtx1.lock();
-	vector<int> submodel = { (model.begin() + (start*h*w)) , (model.begin() + (end*w*h)) }; //this function alone taking 200+ microsecs
-	mtx1.unlock();
-	*/
-
-/*
-	long score = -100000;
-	long tempscore = 0;
-	int letter = 0;
-
-	long counter1 = 0; //to image pixel count
-	long counter2 = 0; //map pos counter
-	for (long iter = 0; iter < w*h*(end-start); iter++)
-	{
-		//tempscore = tempscore + (((((int)pixels[counter1].red)/255)*2)-1) * submodel.at(iter);
-		tempscore = tempscore + (((((int)pixels[counter1].red)/255)*2)-1) * model[iter + (w*h*start)];
-		counter1++;
-
-		if (counter1 == w*h) //||counter==0
-		{
-			if (tempscore > score)
-			{
-				score = tempscore;
-				letter = start + counter2;
-			}
-			if ((verbose == 2 || verbose == 3) && counter1 > 0)
-			{
-				mtx2.lock();
-				cout << "[Joker] Thread " << id << ": 	" << map[start+counter2] << " | " << tempscore << endl;
-				mtx2.unlock();
-			}
-			if (counter1 != 0)
-			{
-				counter2++;
-			}
-			tempscore = 0;
-			counter1 = 0;
-
-		}
-
-
-	}
-
-	//mtx3.lock();
-	threadoutputs[letter] = score;
-	//mtx3.unlock();
-
-	if (verbose == 1 || verbose == 3)
-	{
-		auto stopt = high_resolution_clock::now();
-		auto duration = duration_cast<microseconds>(stopt - startt);
-		cout <<  "[Joker] Thread " << id << " time: "<< duration.count() << " microsecs" <<endl;
-	}
-}
-*/
 
 //very experimental::
 
@@ -490,11 +324,11 @@ void ocr::initthreadpool()
 
 	for (int tc = 0; tc < threadcount; tc++)
 	{
-		workers.push_back(thread(&ocr::worker, this, tc)); //tc acts as thread id
+		workers.push_back(thread(&ocr::worker, this, tc, threadcount)); //tc acts as thread id
 	}
 }
 
-void ocr::worker(int id)
+void ocr::worker(int id, int of)
 {
 	if (verbose == 1 || verbose == 3)
 	{
@@ -552,7 +386,8 @@ void ocr::worker(int id)
 				for (long iter = 0; iter < iterend; iter++) //*1 for now as one job is one comparison
 				{
 					//tempscore = tempscore + (((((int)poolpixels[counter1].red)/255)*2)-1) * model[(modelstart) + iter];
-					tempscore = tempscore + (image[counter1]-1) * model[(modelstart) + iter];
+					//tempscore = tempscore + ((2*image[counter1])-1) * mymodel.pamodel.model[(modelstart) + iter];
+					tempscore += ((2*image.imgcontainer[counter1])-1) * mymodel.pamodel.model[(modelstart) + iter];
 					counter1++;
 
 					if (counter1 == imagelength) //||counter==0
@@ -565,7 +400,7 @@ void ocr::worker(int id)
 						if ((verbose == 2 || verbose == 3) && counter1 > 0)
 						{
 							poolmtx3.lock();
-							cout << "[Joker] Thread " << id << ": 	" << map[mapj + counter2] << " | " << tempscore << endl;
+							cout << "[Joker] Thread " << id << ": 	" << mymodel.pamodel.map[mapj + counter2] << " | " << tempscore << endl;
 							poolmtx3.unlock();
 						}
 						tempscore = 0;
@@ -580,7 +415,7 @@ void ocr::worker(int id)
 				if (score > globalscore)
 				{
 					globalscore = score;
-					result = map[letter];
+					result = mymodel.pamodel.map[letter];
 				}
 				poolmtx4.unlock();
 
@@ -606,13 +441,14 @@ void ocr::worker(int id)
 
 void ocr::job()
 {
+	//adds work to queue, needs updating to add image to stack as well as splitting the map per image
 	auto startt = high_resolution_clock::now();
 
 	//poolpixels = image.getPixels(0, 0, image.columns(), image.rows());
 
-	queue = map.size();
+	queue = mymodel.pamodel.map.size();
 	newwork = 1;
-	while (fin.load() < (int)map.size())
+	while (fin.load() < queue)
 	{
 		continue;
 	}

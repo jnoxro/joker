@@ -76,7 +76,7 @@ void trainer::learnpixelavarage(string trainingdata, string modelname, int edges
 				cout << "[Joker] Trainer: loaded " << samplecounter << " samples for " << mymodel.pamodel.map[i] << endl;
 
 				//map pixel values to between 0-1000
-				float multiplier = 1000 / (float)samplecounter;
+				float multiplier = 100 / (float)samplecounter;
 				for (long int iter = 0; iter < imglen; iter++) //for the newly read character
 				{
 					mymodel.pamodel.model[currentlen + iter] *= multiplier;

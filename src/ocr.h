@@ -17,6 +17,7 @@
 #include <atomic>
 
 #include "imgvect.h"
+#include "model.h"
 
 class ocr
 {
@@ -25,6 +26,7 @@ class ocr
 		std::string result;
 		long globalscore = -100000;
 
+		/*
 		std::vector<long> model;
 		std::vector<std::string> map;
 
@@ -32,17 +34,19 @@ class ocr
 		std::string modeltype;
 
 		std::string filepath;
+		 */
 
+		model mymodel;
 		//Magick::Image image;
 		imgvect image;
 
 		int verbose;
 
-		unsigned int h;
-		unsigned int w;
+		int h;
+		int w;
 
 		void loadmodel();
-		int loadimage();
+		int loadimage(std::string imagepath);
 		void ocrpixelavg();
 
 
@@ -88,7 +92,7 @@ class ocr
 		//Magick::PixelPacket *poolpixels;
 
 		void initthreadpool();
-		void worker(int id);
+		void worker(int id, int of);
 		void job();
 
     public:

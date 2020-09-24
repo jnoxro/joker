@@ -15,13 +15,15 @@
 class imgvect
 {
 	private:
-		std::vector<int> imgcontainer;
+		//std::vector<int> imgcontainer;
 		int readjpg(std::string fname, int threshold);
 		int w;
 		int h;
 
 	public:
 		imgvect(); //constructor
+
+		std::vector<int> imgcontainer; //making this public allows direct index access wihtout overloading operator[] - faster
 		int operator[](int); //allow index access to imgcontainer
 		int read(std::string fname, int threshold);
 
