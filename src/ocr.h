@@ -32,6 +32,8 @@ class ocr
 
 
 		void initthreadpool(int threads); //create threads which wait for jobs
+		std::atomic<int> threadready{0};
+
 		void job(); //add job
 
 		void worker(int id, int numworkers); //worker carries out job
@@ -53,7 +55,7 @@ class ocr
 
 			std::atomic<int> assignmentsfinished{0}; //amount of assignments completed, when this = map.size then job is finished
 			std::string finalresult = ""; //best result
-			long finalscore = -5000000; //preset score very low to prevent it being higher than any upcoming results
+			std::atomic<long> finalscore{-500000}; //preset score very low to prevent it being higher than any upcoming results
 			std::mutex assignmentfinishedmtx; //mutex check results
 		};
 		pajob pa;

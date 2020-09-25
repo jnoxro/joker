@@ -33,7 +33,9 @@ ocr::ocr(string modelname, int threads, int verbose)
 	timer1.end();
 
 	terminate = false;
+	timer1.start("ocr: initthreadpool", verbosity);
 	initthreadpool(threads);
+	timer1.end();
 }
 
 void ocr::initthreadpool(int threads)
@@ -52,6 +54,10 @@ void ocr::initthreadpool(int threads)
 		for (int tc = 0; tc < workercount; tc++)
 		{
 			threadpool.push_back(thread(&ocr::worker, this, tc, workercount)); //tc acts as thread id
+		}
+		while (threadready.load() < workercount)
+		{
+			continue;
 		}
 	}
 	if (verbosity == 2 || verbosity == 3)
@@ -77,7 +83,7 @@ tuple<string, long> ocr::solve(vector<int> target)
 		cerr << "[Joker] Error: ocr: solve: size mismatch\n";
 		exit(EXIT_FAILURE);
 	}
-	return make_tuple(pa.finalresult, pa.finalscore);
+	return make_tuple(pa.finalresult, (long)pa.finalscore.load());
 }
 
 tuple<string, long> ocr::solve(string filepath)
@@ -97,7 +103,7 @@ tuple<string, long> ocr::solve(string filepath)
 		exit(EXIT_FAILURE);
 	}
 
-	return make_tuple(pa.finalresult, pa.finalscore);
+	return make_tuple(pa.finalresult, (long)pa.finalscore.load());
 }
 
 void ocr::job()
@@ -108,7 +114,7 @@ void ocr::job()
 
 		if (workercount == 1)
 		{
-			worker(1,1);
+			worker(1,1); //if not multithreading, call a single worker function
 		}
 
 		while (pa.assignmentsfinished.load() < (int)mymodel.pamodel.map.size()) //wait till all assignments finished
@@ -128,11 +134,15 @@ void ocr::worker(int id, int numworkers)
 		cout << "[Joker] ocr: worker " << id << " started\n";
 		coutmtx.unlock();
 	}
+	threadready++;
+
+	int assignmentsize = (int)mymodel.pamodel.map.size() / numworkers;
 	do
 	{
 		if (mymodel.methodology == "pixelaverage")
 		{
-			int assignmentsize = (int)mymodel.pamodel.map.size() / numworkers;
+
+			int startpoint = 0;
 			pa.assignmentqueuemtx.lock();
 			if (pa.assignmentqueue.load() > 0)
 			{
@@ -145,18 +155,34 @@ void ocr::worker(int id, int numworkers)
 					assignmentsize = pa.assignmentqueue;
 					pa.assignmentqueue = 0;
 				}
+				startpoint = pa.assignmentqueue;
 				pa.assignmentqueuemtx.unlock();
 
-				auto [result, score] = solvepixelaverage(pa.assignmentqueue, assignmentsize, id);
+				auto [result, score] = solvepixelaverage(startpoint, assignmentsize, id);
 
-				pa.assignmentfinishedmtx.lock();
-				pa.assignmentsfinished += assignmentsize;
-				if (score > pa.finalscore)
+				//pa.assignmentfinishedmtx.lock();
+				if (verbosity > 1)
 				{
+					coutmtx.lock();
+					cout << id << " returned info: " << result << " " << score << endl;
+					coutmtx.unlock();
+				}
+				if (score > pa.finalscore.load())
+				{
+					if (verbosity > 1)
+					{
+						coutmtx.lock();
+						cout << id << " NEW RECORD: " << result << " " << score << endl;
+						coutmtx.unlock();
+					}
+					pa.assignmentfinishedmtx.lock(); //lock as final result isnt atomic
 					pa.finalscore = score;
 					pa.finalresult = result;
+					pa.assignmentfinishedmtx.unlock();
 				}
-				pa.assignmentfinishedmtx.unlock();
+
+				pa.assignmentsfinished += assignmentsize;
+				//pa.assignmentfinishedmtx.unlock();
 			}
 			else
 			{
@@ -219,7 +245,7 @@ void ocr::endocr()
 	terminate = true;
 	if (verbosity == 2 || verbosity == 3)
 	{
-		cout << "[Joker] ocr: endocr: thread quit requested";
+		cout << "[Joker] ocr: endocr: thread quit requested\n";
 	}
 	if (workercount != 1)
 	{

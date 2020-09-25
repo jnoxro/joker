@@ -146,7 +146,7 @@ int main(int argc, const char* argv[]) {
 		{
 			cout << "[Joker] Warning: outputting to console effects timers, use -v 1 for more accurate time info\n";
 		}
-		timer1.start("Main: TOTAL OCR SETUP (model load) TIME", verbose);
+		timer1.start("Main: TOTAL OCR SETUP (model load + init threadpool) TIME", verbose);
 		ocr ocrobj(modelpath, threadmode, verbose);
 		timer1.end();
 
