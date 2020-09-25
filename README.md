@@ -34,7 +34,7 @@ This will produce a 'jk' executable within the Build folder wich can be ran with
 
 `make install`  - this may require sudo
 
-This will install the joker libraries and executable to /usr/local. Joker can now be invoked with `jk` in terminal.
+This will install the joker libraries and executable to /usr/local. Joker can now be invoked from anywhere with `jk` in terminal.
 
 
 
