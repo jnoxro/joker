@@ -67,6 +67,7 @@ class ocr
 		std::tuple<std::string, long> solve(std::string filepath); //user can pass filepath to open image with imgvect.cpp
 
 
+
 		void endocr(); //terminate the threadpool
 
 };

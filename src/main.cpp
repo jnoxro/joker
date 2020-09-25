@@ -69,7 +69,7 @@ int main(int argc, const char* argv[]) {
 			{
 				if (mode == 2)
 				{
-					cerr << "[Joker] Error: can't use -o and -t at same time" << endl;
+					cerr << "[Joker] Error: can't use -o and -t at same time\n";
 					return 0;
 				}
 				mode = 1;
@@ -98,7 +98,7 @@ int main(int argc, const char* argv[]) {
 			{
 				if (mode == 1)
 				{
-					cerr << "[Joker] Error: can't use -o and -t at same time" << endl;
+					cerr << "[Joker] Error: can't use -o and -t at same time\n";
 					return 0;
 				}
 				mode = 2;
@@ -142,19 +142,22 @@ int main(int argc, const char* argv[]) {
 	if (mode == 1)
 	{
 
-
-		timer1.start("Main: ocr: setup", verbose);
+		if (verbose == 3)
+		{
+			cout << "[Joker] Warning: outputting to console effects timers, use -v 1 for more accurate time info\n";
+		}
+		timer1.start("Main: TOTAL OCR SETUP (model load) TIME", verbose);
 		ocr ocrobj(modelpath, threadmode, verbose);
 		timer1.end();
 
-		timer1.start("Main: ocr: solve ", verbose);
+		timer1.start("Main: TOTAL OCR SOLVE (image load + job) TIME", verbose);
 		auto [letter, score] = ocrobj.solve(filepath);
 		timer1.end();
-		cout << letter << " " << score << endl;
+		cout << letter << " " << score << "\n";
 
 
 		ocrobj.endocr(); //terminate threadpool
-
+		cout << endl;
 
 	}
 

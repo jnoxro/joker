@@ -56,7 +56,7 @@ void ocr::initthreadpool(int threads)
 	}
 	if (verbosity == 2 || verbosity == 3)
 	{
-		cout << "[Joker] ocr: initthreadpool: worker count " << workercount << endl;
+		cout << "[Joker] ocr: initthreadpool: worker count " << workercount << "\n";
 	}
 }
 
@@ -74,7 +74,7 @@ tuple<string, long> ocr::solve(vector<int> target)
 	else
 	{
 		timer1.end();
-		cerr << "[Joker] Error: ocr: solve: size mismatch" << endl;
+		cerr << "[Joker] Error: ocr: solve: size mismatch\n";
 		exit(EXIT_FAILURE);
 	}
 	return make_tuple(pa.finalresult, pa.finalscore);
@@ -93,7 +93,7 @@ tuple<string, long> ocr::solve(string filepath)
 	else
 	{
 		timer1.end();
-		cerr << "[Joker] Error: ocr: solve: image open error" << endl;
+		cerr << "[Joker] Error: ocr: solve: image open error\n";
 		exit(EXIT_FAILURE);
 	}
 
@@ -115,6 +115,8 @@ void ocr::job()
 		{
 			continue;
 		}
+
+		cout << flush;
 	}
 }
 
@@ -123,7 +125,7 @@ void ocr::worker(int id, int numworkers)
 	if (verbosity == 2 || verbosity == 3)
 	{
 		coutmtx.lock();
-		cout << "[Joker] ocr: worker " << id << " started" << endl;
+		cout << "[Joker] ocr: worker " << id << " started\n";
 		coutmtx.unlock();
 	}
 	do
@@ -168,7 +170,7 @@ void ocr::worker(int id, int numworkers)
 	if (verbosity == 2 || verbosity == 3)
 	{
 		coutmtx.lock();
-		cout << "[Joker] ocr: worker " << id << " ended" << endl;
+		cout << "[Joker] ocr: worker " << id << " ended\n";
 		coutmtx.unlock();
 	}
 }
@@ -194,7 +196,7 @@ tuple<string, long> ocr::solvepixelaverage(int mapbegin, int span, int id)
 			if (verbosity == 2 || verbosity == 3)
 			{
 				coutmtx.lock();
-				cout << id << ": " << mymodel.pamodel.map[mapbegin + counter2] << " " << tempscore << endl;
+				cout << id << ": " << mymodel.pamodel.map[mapbegin + counter2] << " " << tempscore << "\n";
 				coutmtx.unlock();
 			}
 			if (tempscore > score)
@@ -217,7 +219,7 @@ void ocr::endocr()
 	terminate = true;
 	if (verbosity == 2 || verbosity == 3)
 	{
-		cout << "[Joker] ocr: endocr: thread quit requested" << endl;
+		cout << "[Joker] ocr: endocr: thread quit requested";
 	}
 	if (workercount != 1)
 	{

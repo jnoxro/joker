@@ -39,6 +39,6 @@ void timer::end()
 	{
 		endtime = steady_clock::now();
 		auto dur = duration_cast<microseconds>(endtime-starttime).count();
-		cout << "[Joker] Timer " << id << ": " << dur << " microsecs" << endl;
+		cout << "[Joker] Timer " << id << ": " << dur << " microsecs\n";
 	}
 }
