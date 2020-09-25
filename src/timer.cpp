@@ -35,10 +35,10 @@ void timer::start(string s, int v)
 
 void timer::end()
 {
-	if (verbosity > 0)
+	if (verbosity == 1 || verbosity == 3)
 	{
 		endtime = steady_clock::now();
-		auto dur = duration_cast<microseconds>(endtime-starttime);
-		cout << "[Joker] Timer " << id << ": " << dur << endl;
+		auto dur = duration_cast<microseconds>(endtime-starttime).count();
+		cout << "[Joker] Timer " << id << ": " << dur << " microsecs" << endl;
 	}
 }

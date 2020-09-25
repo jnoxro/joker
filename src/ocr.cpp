@@ -32,6 +32,7 @@ ocr::ocr(string modelname, int threads, int verbose)
 	mymodel.load(modelname);
 	timer1.end();
 
+	terminate = false;
 	initthreadpool(threads);
 }
 
@@ -48,37 +49,185 @@ void ocr::initthreadpool(int threads)
 		{
 			workercount = threads;
 		}
-		if (verbosity == 1 || verbosity == 3)
-		{
-			cout << "[Joker] Ocr: initthreadpool: worker count " << workercount << endl;
-		}
 		for (int tc = 0; tc < workercount; tc++)
 		{
 			threadpool.push_back(thread(&ocr::worker, this, tc, workercount)); //tc acts as thread id
 		}
-
+	}
+	if (verbosity == 2 || verbosity == 3)
+	{
+		cout << "[Joker] ocr: initthreadpool: worker count " << workercount << endl;
 	}
 }
 
-tuple<string, long> ocr::solve(vector<long> target)
+tuple<string, long> ocr::solve(vector<int> target)
 {
-	image.imgcontainer = target;
-	addjob();
-	return make_tuple(finalresult, finalscore);
+	timer1.start("ocr: solve: image read", verbosity);
+	if ((long)target.size() == mymodel.pamodel.height * mymodel.pamodel.width)
+	{
+		timer1.end();
+		image.imgcontainer = target;
+		timer1.start("ocr: solve: job", verbosity);
+		job();
+		timer1.end();
+	}
+	else
+	{
+		timer1.end();
+		cerr << "[Joker] Error: ocr: solve: size mismatch" << endl;
+		exit(EXIT_FAILURE);
+	}
+	return make_tuple(pa.finalresult, pa.finalscore);
 }
 
 tuple<string, long> ocr::solve(string filepath)
 {
-	if(image.read(filepath, 125) == 0)
+	timer1.start("ocr: solve: image read", verbosity);
+	if(image.read(filepath, 125) == 1)
 	{
-		cerr << "[Joker] Error: ocr: solve: image open error" << endl;
-		finalresult = "";
-		finalscore = -500000;
+		timer1.end();
+		timer1.start("ocr: solve: job", verbosity);
+		job();
+		timer1.end();
 	}
 	else
 	{
-		addjob();
+		timer1.end();
+		cerr << "[Joker] Error: ocr: solve: image open error" << endl;
+		exit(EXIT_FAILURE);
 	}
 
-	return make_tuple(finalresult, finalscore);
+	return make_tuple(pa.finalresult, pa.finalscore);
+}
+
+void ocr::job()
+{
+	if(mymodel.methodology == "pixelaverage")
+	{
+		pa.assignmentqueue = (int)mymodel.pamodel.map.size();
+
+		if (workercount == 1)
+		{
+			worker(1,1);
+		}
+
+		while (pa.assignmentsfinished.load() < (int)mymodel.pamodel.map.size()) //wait till all assignments finished
+		{
+			continue;
+		}
+	}
+}
+
+void ocr::worker(int id, int numworkers)
+{
+	if (verbosity == 2 || verbosity == 3)
+	{
+		coutmtx.lock();
+		cout << "[Joker] ocr: worker " << id << " started" << endl;
+		coutmtx.unlock();
+	}
+	do
+	{
+		if (mymodel.methodology == "pixelaverage")
+		{
+			int assignmentsize = (int)mymodel.pamodel.map.size() / numworkers;
+			pa.assignmentqueuemtx.lock();
+			if (pa.assignmentqueue.load() > 0)
+			{
+				if (pa.assignmentqueue >= assignmentsize)
+				{
+					pa.assignmentqueue -= assignmentsize;
+				}
+				else
+				{
+					assignmentsize = pa.assignmentqueue;
+					pa.assignmentqueue = 0;
+				}
+				pa.assignmentqueuemtx.unlock();
+
+				auto [result, score] = solvepixelaverage(pa.assignmentqueue, assignmentsize, id);
+
+				pa.assignmentfinishedmtx.lock();
+				pa.assignmentsfinished += assignmentsize;
+				if (score > pa.finalscore)
+				{
+					pa.finalscore = score;
+					pa.finalresult = result;
+				}
+				pa.assignmentfinishedmtx.unlock();
+			}
+			else
+			{
+				pa.assignmentqueuemtx.unlock();
+			}
+		}
+	} while (terminate.load() == false && numworkers > 1);
+	quitmtx.lock();
+	confirmquit++;
+	quitmtx.unlock();
+	if (verbosity == 2 || verbosity == 3)
+	{
+		coutmtx.lock();
+		cout << "[Joker] ocr: worker " << id << " ended" << endl;
+		coutmtx.unlock();
+	}
+}
+
+tuple<string, long> ocr::solvepixelaverage(int mapbegin, int span, int id)
+{
+	long imglen = mymodel.pamodel.height * mymodel.pamodel.width;
+	long looplen = span * imglen;
+	long modelstart = mapbegin * imglen;
+
+	long score = -500000;
+	long tempscore = 0;
+	int letter = 0;
+	long counter1 = 0;
+	long counter2 = 0;
+	for (long iter = 0; iter < looplen; iter++) //*1 for now as one job is one comparison
+	{
+		tempscore += ((2*image.imgcontainer[counter1])-1) * mymodel.pamodel.model[(modelstart) + iter];
+		counter1++;
+
+		if (counter1 == imglen) //||counter==0
+		{
+			if (verbosity == 2 || verbosity == 3)
+			{
+				coutmtx.lock();
+				cout << id << ": " << mymodel.pamodel.map[mapbegin + counter2] << " " << tempscore << endl;
+				coutmtx.unlock();
+			}
+			if (tempscore > score)
+			{
+				score = tempscore;
+				letter = mapbegin + counter2;
+			}
+			tempscore = 0;
+			counter1 = 0;
+			counter2 += 1;
+
+		}
+	}
+
+	return make_tuple(mymodel.pamodel.map[letter], score);
+}
+
+void ocr::endocr()
+{
+	terminate = true;
+	if (verbosity == 2 || verbosity == 3)
+	{
+		cout << "[Joker] ocr: endocr: thread quit requested" << endl;
+	}
+	if (workercount != 1)
+	{
+		for (int tc = 0; tc < workercount; tc++)
+		{
+			threadpool[tc].join();
+		}
+	}
+	while (confirmquit.load() < workercount)
+	{
+		continue;
+	}
 }

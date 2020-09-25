@@ -44,7 +44,7 @@ int main(int argc, const char* argv[]) {
 	string datapath = "data";
 	string newmodel = "mymodel";
 	string method = "pixelaverage";
-	int threadmode = 0;
+	int threadmode = 1;
 	int verbose = 0;
 	int mode = 0;
 	int e = 0;
@@ -84,7 +84,7 @@ int main(int argc, const char* argv[]) {
 					}
 					if (argu1 == "-thread")
 					{
-						threadmode = 1;
+						threadmode = stoi(argv[count1+1]);
 					}
 					if (argu1 == "-v")
 					{
@@ -145,8 +145,8 @@ int main(int argc, const char* argv[]) {
 
 		ocr ocrobj(modelpath, threadmode, verbose);
 
-		string letter = ocrobj.initocr(filepath);
-		cout << letter << endl;
+		auto [letter, score] = ocrobj.solve(filepath);
+		cout << letter << " " << score << endl;
 
 
 		if (verbose == 1 || verbose == 3)
@@ -156,10 +156,9 @@ int main(int argc, const char* argv[]) {
 			cout << "[Joker] Total time: " << duration.count() << " millisecs" <<endl;
 		}
 
-		if (threadmode == 1)
-		{
-			ocrobj.endocr(); //terminate threadpool
-		}
+
+		ocrobj.endocr(); //terminate threadpool
+
 
 	}
 

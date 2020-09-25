@@ -65,7 +65,7 @@ void trainer::learnpixelavarage(string trainingdata, string modelname, int edges
 					{
 						mymodel.pamodel.model.push_back(0);
 					}
-					mymodel.pamodel.model[currentlen + iter] = mymodel.pamodel.model[currentlen + iter] + image[iter];
+					mymodel.pamodel.model[currentlen + iter] = mymodel.pamodel.model[currentlen + iter] + image.imgcontainer[iter];
 
 				}
 				samplecounter++;

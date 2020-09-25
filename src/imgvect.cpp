@@ -28,10 +28,12 @@ imgvect::imgvect()
 	h = 0;
 }
 
+/*
 int imgvect::operator[] (int index)
 {
 	return imgcontainer[index];
 }
+*/
 
 int imgvect::read(string fname, int threshold)
 {
