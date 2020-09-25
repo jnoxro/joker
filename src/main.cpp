@@ -29,6 +29,7 @@
 #include "joker.h"
 #include "trainer.h"
 #include "ocr.h"
+#include "timer.h"
 
 
 using namespace std;
@@ -37,6 +38,7 @@ using namespace std::chrono;
 
 int main(int argc, const char* argv[]) {
 	//InitializeMagick(NULL);
+	timer timer1;
 
 	//defaults//
 	string filepath = "test.jpg";
@@ -141,20 +143,14 @@ int main(int argc, const char* argv[]) {
 	{
 
 
-		auto start = high_resolution_clock::now();
-
+		timer1.start("Main: ocr: setup", verbose);
 		ocr ocrobj(modelpath, threadmode, verbose);
+		timer1.end();
 
+		timer1.start("Main: ocr: solve ", verbose);
 		auto [letter, score] = ocrobj.solve(filepath);
+		timer1.end();
 		cout << letter << " " << score << endl;
-
-
-		if (verbose == 1 || verbose == 3)
-		{
-			auto stop = high_resolution_clock::now();
-			auto duration = duration_cast<milliseconds>(stop - start);
-			cout << "[Joker] Total time: " << duration.count() << " millisecs" <<endl;
-		}
 
 
 		ocrobj.endocr(); //terminate threadpool
