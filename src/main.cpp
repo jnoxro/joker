@@ -157,7 +157,7 @@ int main(int argc, const char* argv[]) {
 
 
 		ocrobj.endocr(); //terminate threadpool
-		cout << endl;
+		cout << flush;
 
 	}
 
