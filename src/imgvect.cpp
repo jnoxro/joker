@@ -12,6 +12,7 @@
 //
 
 #include <string>
+#include <sstream>
 #include <iostream>
 #include <iomanip>
 #include <stdlib.h>
